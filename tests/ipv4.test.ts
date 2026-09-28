@@ -126,12 +126,15 @@ describe('adresanalyse', () => {
     expect(formatIp(networkAddress(ip('255.255.255.255'), 24))).toBe('255.255.255.0')
   })
 
-  it('/31 en /32', () => {
-    expect(hostCount(31)).toBe(2)
-    expect(hostCount(32)).toBe(1)
-    expect(formatIp(firstHost(ip('10.0.0.1'), 31))).toBe('10.0.0.0')
-    expect(formatIp(lastHost(ip('10.0.0.0'), 31))).toBe('10.0.0.1')
-    expect(formatIp(firstHost(ip('10.0.0.7'), 32))).toBe('10.0.0.7')
+  it('/31 en /32 hebben geen bruikbare adressen (maximum /30)', () => {
+    expect(hostCount(30)).toBe(2)
+    expect(hostCount(31)).toBe(0)
+    expect(hostCount(32)).toBe(0)
+    expect(formatIp(firstHost(ip('10.0.0.1'), 30))).toBe('10.0.0.1')
+    expect(formatIp(lastHost(ip('10.0.0.1'), 30))).toBe('10.0.0.2')
+    expect(() => firstHost(ip('10.0.0.1'), 31)).toThrow()
+    expect(() => lastHost(ip('10.0.0.1'), 32)).toThrow()
+    expect(() => networkInfo(ip('10.0.0.1'), 31)).toThrow()
   })
 })
 
@@ -199,6 +202,7 @@ describe('subnetten (FLSM)', () => {
 
   it('weigert onmogelijke splitsingen en indexen', () => {
     expect(() => planSubnets(ip('192.168.1.0'), 24, 128)).toThrow()
+    expect(planSubnets(ip('192.168.1.0'), 24, 64).newPrefix).toBe(30)
     const plan = planSubnets(ip('192.168.1.0'), 24, 2)
     expect(() => subnetAt(plan, 2)).toThrow()
   })

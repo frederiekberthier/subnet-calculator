@@ -128,21 +128,29 @@ export function broadcastAddress(ip: number, prefix: number): number {
   return (ip | ~prefixToMask(prefix)) >>> 0
 }
 
-// /31 (point-to-point, RFC 3021) en /32 (één host) hebben geen apart netwerk- of broadcastadres.
+// In de opleiding zijn "bruikbare" adressen adressen die aan een toestel gekoppeld kunnen worden.
+// Daarom is /30 de grootste toegelaten prefix: /31 en /32 hebben geen bruikbare hostadressen.
+export const MAX_USABLE_PREFIX = 30
+
+function assertUsable(prefix: number): void {
+  if (prefix > MAX_USABLE_PREFIX) {
+    throw new RangeError(`/${prefix} heeft geen bruikbare hostadressen (maximum /${MAX_USABLE_PREFIX})`)
+  }
+}
+
 export function firstHost(ip: number, prefix: number): number {
-  const net = networkAddress(ip, prefix)
-  return prefix >= 31 ? net : net + 1
+  assertUsable(prefix)
+  return networkAddress(ip, prefix) + 1
 }
 
 export function lastHost(ip: number, prefix: number): number {
-  const bc = broadcastAddress(ip, prefix)
-  return prefix >= 31 ? bc : bc - 1
+  assertUsable(prefix)
+  return broadcastAddress(ip, prefix) - 1
 }
 
+/** Aantal bruikbare hostadressen: 2^hostbits - 2 (0 voor /31 en /32). */
 export function hostCount(prefix: number): number {
-  if (prefix === 32) return 1
-  if (prefix === 31) return 2
-  return 2 ** (32 - prefix) - 2
+  return Math.max(0, 2 ** (32 - prefix) - 2)
 }
 
 export function networkInfo(ip: number, prefix: number): NetworkInfo {
@@ -192,12 +200,12 @@ export function bitsNeeded(n: number): number {
 
 /**
  * Splits een netwerk in minstens `requested` even grote subnetten (FLSM).
- * Gooit een fout als er niet genoeg hostbits zijn (minstens 2 hostbits blijven over).
+ * Gooit een fout als de nieuwe prefix groter dan /30 zou worden.
  */
 export function planSubnets(ip: number, prefix: number, requested: number): SubnetPlan {
   const borrowedBits = bitsNeeded(requested)
   const newPrefix = prefix + borrowedBits
-  if (newPrefix > 30) {
+  if (newPrefix > MAX_USABLE_PREFIX) {
     throw new RangeError(`Niet mogelijk: /${prefix} kan niet in ${requested} subnetten gesplitst worden`)
   }
   return {
