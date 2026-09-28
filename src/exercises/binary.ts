@@ -1,5 +1,141 @@
+import { checkBinaryOctet, checkDecimalOctet, checkPrefix, type FieldResult } from '../lib/check'
+import { generateBinary, type Direction } from '../lib/generators'
+import { formatBinary, formatIp, octetToBinary, prefixToMask, toOctets } from '../lib/ipv4'
 import type { Page } from '../router'
+import { clearMarks, feedbackHtml, levelSelectHtml, markField, readState, wireToolbar } from '../ui/exercise'
+import { octetInputs, octetInputsHtml, octetValues, wireOctetInputs } from '../ui/octets'
+
+const PATH = '/binair'
+const DIRECTIONS: Record<string, string> = {
+  willekeurig: 'Willekeurig',
+  dec2bin: 'Decimaal → binair',
+  bin2dec: 'Binair → decimaal',
+}
+const WEIGHTS = [128, 64, 32, 16, 8, 4, 2, 1]
+
+/** Tabel met de bitgewichten per byte, als uitwerking van de oplossing. */
+function weightTable(title: string, value: number): string {
+  const rows = toOctets(value)
+    .map((octet, i) => {
+      const bits = octetToBinary(octet)
+      const terms = WEIGHTS.filter((_, b) => bits[b] === '1')
+      return `
+        <tr>
+          <th scope="row">Byte ${i + 1}</th>
+          ${[...bits].map((bit) => `<td class="bit ${bit === '1' ? 'bit-on' : ''}">${bit}</td>`).join('')}
+          <td class="dec">${octet}</td>
+          <td class="sum">${terms.length ? terms.join(' + ') : '0'}</td>
+        </tr>`
+    })
+    .join('')
+  return `
+    <h3>${title}</h3>
+    <div class="table-scroll">
+      <table class="weights">
+        <thead>
+          <tr><th></th>${WEIGHTS.map((w) => `<th>${w}</th>`).join('')}<th>Decimaal</th><th>Som</th></tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`
+}
 
 export const binaryPage: Page = (root) => {
-  root.innerHTML = `<h1>1. Binair ↔ decimaal</h1><p>Deze oefening is nog in opbouw.</p>`
+  const state = readState(PATH)
+  const choice = state.params.get('richting') ?? 'willekeurig'
+  const direction: Direction | undefined = choice === 'dec2bin' || choice === 'bin2dec' ? choice : undefined
+  const ex = generateBinary(state.rng, state.level, direction)
+  const mask = prefixToMask(ex.prefix)
+  const toBinary = ex.direction === 'dec2bin'
+  const answerKind = toBinary ? 'bin' : 'dec'
+  // <wbr> na elke punt: op smalle schermen breekt een binair adres enkel tussen twee bytes.
+  const show = (v: number) => (toBinary ? formatIp(v) : formatBinary(v)).replaceAll('.', '.<wbr>')
+
+  root.innerHTML = `
+    <h1>1. Binair ↔ decimaal</h1>
+    <p class="lead">
+      ${
+        toBinary
+          ? 'Zet het IP-adres en het subnetmasker om naar binair: 8 bits per byte.'
+          : 'Zet het IP-adres en het subnetmasker om naar decimaal: een getal van 0 tot 255 per byte.'
+      }
+      Geef ook de prefix van het subnetmasker.
+    </p>
+
+    <div class="toolbar">
+      ${levelSelectHtml(state.level)}
+      <label class="control">Richting
+        <select data-setting="richting">
+          ${Object.entries(DIRECTIONS)
+            .map(([v, label]) => `<option value="${v}" ${v === choice ? 'selected' : ''}>${label}</option>`)
+            .join('')}
+        </select>
+      </label>
+      <button type="button" class="btn" data-action="new">Nieuwe oefening</button>
+    </div>
+
+    <form class="panel exercise" novalidate>
+      <div class="qa">
+        <div class="qa-label">IP-adres</div>
+        <div class="given mono">${show(ex.ip)}</div>
+        ${octetInputsHtml('ip', answerKind, 'IP-adres')}
+
+        <div class="qa-label">Subnetmasker</div>
+        <div class="given mono">${show(mask)}</div>
+        ${octetInputsHtml('mask', answerKind, 'Subnetmasker')}
+
+        <label class="qa-label" for="prefix">Prefix</label>
+        <div class="given muted">aantal 1-bits in het masker</div>
+        <div class="prefix-input"><span>/</span><input id="prefix" inputmode="numeric" maxlength="3" autocomplete="off"></div>
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">Controleer</button>
+        <button type="button" class="btn" data-action="solution">Toon oplossing</button>
+      </div>
+      <div class="feedback-area" aria-live="polite"></div>
+    </form>
+
+    <section class="panel solution" hidden>
+      <h2>Oplossing</h2>
+      ${weightTable(`IP-adres ${formatIp(ex.ip)}`, ex.ip)}
+      ${weightTable(`Subnetmasker ${formatIp(mask)}`, mask)}
+      <p>Het subnetmasker bevat <strong>${ex.prefix}</strong> enen op rij, dus de prefix is <strong>/${ex.prefix}</strong>.</p>
+    </section>`
+
+  const form = root.querySelector('form')!
+  const feedback = root.querySelector<HTMLElement>('.feedback-area')!
+  const solution = root.querySelector<HTMLElement>('.solution')!
+  const prefixInput = root.querySelector<HTMLInputElement>('#prefix')!
+  wireToolbar(root, state)
+  wireOctetInputs(form)
+  prefixInput.addEventListener('input', () => {
+    prefixInput.value = prefixInput.value.replace(/\D/g, '')
+  })
+  octetInputs(form, 'ip')[0].focus()
+
+  const checkOctet = toBinary ? checkBinaryOctet : checkDecimalOctet
+  form.addEventListener('submit', (e) => {
+    e.preventDefault()
+    clearMarks(form)
+    const results: FieldResult[] = []
+    for (const [name, value] of [['ip', ex.ip], ['mask', mask]] as const) {
+      const expected = toOctets(value)
+      const inputs = octetInputs(form, name)
+      octetValues(form, name).forEach((text, i) => {
+        const r = checkOctet(text, expected[i])
+        markField(inputs[i], r)
+        results.push(r)
+      })
+    }
+    const r = checkPrefix(prefixInput.value, ex.prefix)
+    markField(prefixInput, r)
+    results.push(r)
+    feedback.innerHTML = feedbackHtml(results)
+  })
+
+  root.querySelector('[data-action="solution"]')!.addEventListener('click', () => {
+    solution.hidden = false
+    solution.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  })
 }

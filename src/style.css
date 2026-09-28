@@ -198,3 +198,241 @@ main {
   border-top: 1px solid var(--border);
   text-align: center;
 }
+
+/* ---------- Oefeningen ---------- */
+
+.mono {
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.panel {
+  margin-top: 1rem;
+  padding: 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem 1rem;
+}
+
+.control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+select,
+input,
+.btn {
+  font: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+select {
+  padding: 0.4rem 0.5rem;
+}
+
+.btn {
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+  background: var(--surface);
+}
+
+.btn:hover {
+  border-color: var(--accent);
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+@media (prefers-color-scheme: dark) {
+  .btn-primary {
+    color: #0b1220;
+  }
+}
+
+.qa {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+}
+
+.qa-label {
+  font-weight: 600;
+}
+
+.given {
+  white-space: nowrap;
+}
+
+.octets {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.dot {
+  font-weight: 700;
+  color: var(--muted);
+}
+
+input.octet,
+.prefix-input input {
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  padding: 0.4rem;
+  text-align: center;
+}
+
+.octets-dec input.octet,
+.prefix-input input {
+  width: 3.6em;
+}
+
+.octets-bin input.octet {
+  width: 7.2em;
+}
+
+.prefix-input {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+input:focus,
+select:focus,
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+input.is-ok {
+  border-color: var(--ok);
+  background: var(--ok-bg);
+}
+
+input.is-wrong,
+input.is-empty {
+  border-color: var(--err);
+  background: var(--err-bg);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.feedback {
+  margin: 1rem 0 0;
+  font-weight: 600;
+}
+
+.feedback-ok {
+  color: var(--ok);
+}
+
+.feedback-wrong {
+  color: var(--err);
+}
+
+.hints {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+}
+
+.solution h2 {
+  margin-top: 0;
+}
+
+.solution h3 {
+  margin: 1.25rem 0 0.5rem;
+  font-size: 1rem;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+table.weights {
+  border-collapse: collapse;
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  font-size: 0.9rem;
+}
+
+table.weights th,
+table.weights td {
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+table.weights thead th {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+table.weights tbody th {
+  font-family: system-ui, sans-serif;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+}
+
+td.bit-on {
+  background: var(--ok-bg);
+  color: var(--ok);
+  font-weight: 700;
+}
+
+td.dec {
+  font-weight: 700;
+}
+
+td.sum {
+  text-align: left;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* Op smalle schermen: label boven opgave, invoer eronder. */
+@media (max-width: 720px) {
+  .qa {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+
+  .qa > .octets,
+  .qa > .prefix-input {
+    margin-bottom: 0.75rem;
+  }
+
+  .given {
+    white-space: normal;
+  }
+
+  .octets-bin input.octet {
+    width: 100%;
+    min-width: 0;
+    font-size: 0.8rem;
+    padding: 0.4rem 0.1rem;
+  }
+}
