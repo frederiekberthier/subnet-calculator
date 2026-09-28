@@ -47,3 +47,9 @@ export function checkInteger(input: string, expected: number): FieldResult {
   if (!/^\d+$/.test(t)) return { status: 'format', hint: 'Geef een geheel getal.' }
   return Number(t) === expected ? OK : WRONG
 }
+
+/** Keuze uit een vaste lijst (bv. klasse of publiek/privaat); null = niets gekozen. */
+export function checkChoice(input: string | null, expected: string): FieldResult {
+  if (input === null || input === '') return EMPTY
+  return input === expected ? OK : WRONG
+}

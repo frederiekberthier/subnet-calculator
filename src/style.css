@@ -21,6 +21,8 @@
   --err: #c82333;
   --err-bg: #fbe7e9;
   --bit-off: #edf2f5;
+  --host-on: #f7b3d6;
+  --host-off: #fdeef6;
   --shadow: 0 1px 2px rgb(28 29 30 / 0.04), 0 4px 16px rgb(28 29 30 / 0.06);
   --radius: 16px;
   --font-body: 'Open Sans Variable', 'Open Sans', Arial, Verdana, sans-serif;
@@ -50,6 +52,8 @@
     --err: #ff7b86;
     --err-bg: #3a1a1e;
     --bit-off: #2a2e32;
+    --host-on: #c2408a;
+    --host-off: #3a2231;
     --shadow: none;
   }
 }
@@ -453,6 +457,269 @@ input.is-empty {
   font-size: 1.05rem;
 }
 
+/* ---------- Oefening 2: adresanalyse ---------- */
+
+.assignment {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 3rem;
+}
+
+.assignment > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.assignment-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.assignment-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--heading);
+}
+
+.qa.qa-2 {
+  grid-template-columns: max-content minmax(0, 1fr);
+}
+
+.hosts-input {
+  width: 9rem;
+  padding: 0 0.6rem;
+}
+
+.choice {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-self: start;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.choice label {
+  position: relative;
+}
+
+.choice input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  min-height: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.choice span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3rem;
+  min-height: 44px;
+  padding: 0 1rem;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  border-left: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.choice label:first-child span {
+  border-left: 0;
+}
+
+.choice input:checked + span {
+  background: var(--brand);
+  color: #1c1d1e;
+}
+
+.choice input:focus-visible + span {
+  outline: 3px solid var(--brand);
+  outline-offset: -3px;
+}
+
+.choice.is-ok {
+  border-color: var(--ok);
+}
+
+.choice.is-ok input:checked + span {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+
+.choice.is-wrong,
+.choice.is-empty {
+  border-color: var(--err);
+  background: var(--err-bg);
+}
+
+.choice.is-wrong input:checked + span {
+  background: var(--err);
+  color: #fff;
+}
+
+/* Overzicht juist/jouw antwoord */
+
+.overview {
+  display: grid;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.ov-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 0.25rem 1rem;
+  align-items: center;
+  padding: 0.55rem 0.9rem;
+  border-top: 1px solid var(--border);
+}
+
+.ov-row:first-child {
+  border-top: 0;
+}
+
+.ov-label {
+  font-weight: 600;
+}
+
+.ov-correct {
+  font-weight: 700;
+  color: var(--heading);
+}
+
+.ov-ok .ov-given {
+  color: var(--ok);
+  font-weight: 600;
+}
+
+.ov-wrong {
+  background: var(--err-bg);
+}
+
+.ov-wrong .ov-given {
+  color: var(--err);
+  font-weight: 600;
+}
+
+.ov-empty .ov-given {
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* Binaire AND-tabel */
+
+.and-table {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.at-row {
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr) 9.5rem;
+  align-items: center;
+  gap: 1rem;
+}
+
+.at-label {
+  font-weight: 700;
+}
+
+.at-bits {
+  display: flex;
+  align-items: flex-end;
+  min-width: 0;
+}
+
+.at-byte {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+}
+
+.at-byte > span {
+  padding: 0.3rem 0;
+  text-align: center;
+  font-weight: 800;
+  border-right: 1px solid var(--surface);
+}
+
+.at-byte .on {
+  background: var(--brand);
+  color: #1c1d1e;
+}
+
+.at-byte .off {
+  background: var(--bit-off);
+  color: var(--muted);
+}
+
+.at-byte .host.on {
+  background: var(--host-on);
+}
+
+.at-byte .host.off {
+  background: var(--host-off);
+}
+
+.at-byte .boundary {
+  box-shadow: inset 3px 0 0 var(--link);
+}
+
+.at-dot {
+  width: 0.9rem;
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+  color: var(--heading);
+}
+
+.at-dec {
+  font-weight: 700;
+  color: var(--heading);
+}
+
+.at-rule {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.2rem 0;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--link);
+}
+
+.at-rule::before,
+.at-rule::after {
+  content: '';
+  flex: 1;
+  border-top: 2px solid var(--heading);
+}
+
+.at-rule::before {
+  flex: 0 0 8.5rem;
+}
+
+.bs-split .bs-key.at-key-host {
+  background: var(--host-on);
+}
+
+.steps {
+  margin: 1.25rem 0 0;
+  padding-left: 1.4rem;
+}
+
+.steps li {
+  margin-bottom: 0.5rem;
+}
+
 /* Bitstrook: 4 bytes naast elkaar met gewichten, bits, decimaal en som. */
 
 .bitstrip {
@@ -726,6 +993,37 @@ input.is-empty {
   .bs-bytes {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .qa.qa-2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .qa > .choice,
+  .qa > .hosts-input {
+    margin-bottom: 1rem;
+  }
+
+  .at-row {
+    grid-template-columns: auto 1fr;
+    gap: 0.1rem 0.75rem;
+  }
+
+  .at-bits {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .at-dec {
+    text-align: right;
+  }
+
+  .at-dot {
+    width: 0.7rem;
+  }
+
+  .at-rule::before {
+    flex: 1;
+  }
 }
 
 @media (max-width: 560px) {
@@ -736,6 +1034,30 @@ input.is-empty {
   .bs-weights span {
     font-size: 0.6rem;
     letter-spacing: -0.07em;
+  }
+
+  .at-byte > span {
+    font-size: 0.72rem;
+    padding: 0.25rem 0;
+  }
+
+  .ov-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .ov-label {
+    grid-column: 1 / -1;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .ov-given {
+    text-align: right;
+    font-size: 0.85rem;
+  }
+
+  .assignment-value {
+    font-size: 1.35rem;
   }
 }
 

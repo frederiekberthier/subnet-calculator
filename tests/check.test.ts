@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { checkBinaryOctet, checkDecimalOctet, checkInteger, checkIp, checkPrefix } from '../src/lib/check'
+import { checkBinaryOctet, checkChoice, checkDecimalOctet, checkInteger, checkIp, checkPrefix } from '../src/lib/check'
 
 const status = (r: { status: string }) => r.status
 
@@ -53,5 +53,13 @@ describe('checkInteger', () => {
     expect(status(checkInteger('8 190', 8190))).toBe('ok')
     expect(status(checkInteger('8191', 8190))).toBe('wrong')
     expect(status(checkInteger('abc', 1))).toBe('format')
+  })
+})
+
+describe('checkChoice', () => {
+  it('juist, fout en niets gekozen', () => {
+    expect(status(checkChoice('B', 'B'))).toBe('ok')
+    expect(status(checkChoice('C', 'B'))).toBe('wrong')
+    expect(status(checkChoice(null, 'B'))).toBe('empty')
   })
 })
