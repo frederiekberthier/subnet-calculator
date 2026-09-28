@@ -15,16 +15,19 @@ const WEIGHTS = [128, 64, 32, 16, 8, 4, 2, 1]
 
 /** Tabel met de bitgewichten per byte, als uitwerking van de oplossing. */
 function weightTable(title: string, value: number): string {
+  const sums = toOctets(value).map((octet) => {
+    const terms = WEIGHTS.filter((w) => octet & w)
+    return `${terms.length ? terms.join(' + ') : '0'} = ${octet}`
+  })
   const rows = toOctets(value)
     .map((octet, i) => {
       const bits = octetToBinary(octet)
-      const terms = WEIGHTS.filter((_, b) => bits[b] === '1')
       return `
         <tr>
-          <th scope="row">Byte ${i + 1}</th>
+          <th scope="row"><span class="byte-word">Byte </span>${i + 1}</th>
           ${[...bits].map((bit) => `<td class="bit ${bit === '1' ? 'bit-on' : ''}">${bit}</td>`).join('')}
           <td class="dec">${octet}</td>
-          <td class="sum">${terms.length ? terms.join(' + ') : '0'}</td>
+          <td class="sum">${sums[i]}</td>
         </tr>`
     })
     .join('')
@@ -33,11 +36,12 @@ function weightTable(title: string, value: number): string {
     <div class="table-scroll">
       <table class="weights">
         <thead>
-          <tr><th></th>${WEIGHTS.map((w) => `<th>${w}</th>`).join('')}<th>Decimaal</th><th>Som</th></tr>
+          <tr><th></th>${WEIGHTS.map((w) => `<th>${w}</th>`).join('')}<th>Dec</th><th class="sum">Som</th></tr>
         </thead>
         <tbody>${rows}</tbody>
       </table>
-    </div>`
+    </div>
+    <ol class="sums-compact">${sums.map((sum) => `<li>${sum}</li>`).join('')}</ol>`
 }
 
 export const binaryPage: Page = (root) => {

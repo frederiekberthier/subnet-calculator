@@ -9,9 +9,9 @@ export function octetInputsHtml(name: string, kind: OctetKind, label: string): s
       ${[0, 1, 2, 3]
         .map(
           (i) =>
-            `<input class="octet" data-field="${name}" data-index="${i}" ${attrs} autocomplete="off" spellcheck="false" aria-label="${label}, byte ${i + 1}">`,
+            `<span class="byte"><input class="octet" data-field="${name}" data-index="${i}" ${attrs} autocomplete="off" spellcheck="false" aria-label="${label}, byte ${i + 1}">${i < 3 ? '<span class="dot">.</span>' : ''}</span>`,
         )
-        .join('<span class="dot">.</span>')}
+        .join('')}
     </div>`
 }
 

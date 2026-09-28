@@ -1,3 +1,5 @@
+import '@fontsource-variable/nunito'
+import '@fontsource-variable/open-sans'
 import './style.css'
 import { startRouter } from './router'
 import { homePage, notFoundPage } from './pages/home'
