@@ -1,7 +1,8 @@
 import { checkBinaryOctet, checkDecimalOctet, checkPrefix, type FieldResult } from '../lib/check'
 import { generateBinary, type Direction } from '../lib/generators'
-import { formatBinary, formatIp, octetToBinary, prefixToMask, toOctets } from '../lib/ipv4'
+import { formatBinary, formatIp, prefixToMask, toOctets } from '../lib/ipv4'
 import type { Page } from '../router'
+import { bitStripHtml } from '../ui/bitstrip'
 import { clearMarks, feedbackHtml, levelSelectHtml, markField, readState, wireToolbar } from '../ui/exercise'
 import { octetInputs, octetInputsHtml, octetValues, wireOctetInputs } from '../ui/octets'
 
@@ -11,39 +12,6 @@ const DIRECTIONS: Record<string, string> = {
   dec2bin: 'Decimaal → binair',
   bin2dec: 'Binair → decimaal',
 }
-const WEIGHTS = [128, 64, 32, 16, 8, 4, 2, 1]
-
-/** Tabel met de bitgewichten per byte, als uitwerking van de oplossing. */
-function weightTable(title: string, value: number): string {
-  const sums = toOctets(value).map((octet) => {
-    const terms = WEIGHTS.filter((w) => octet & w)
-    return `${terms.length ? terms.join(' + ') : '0'} = ${octet}`
-  })
-  const rows = toOctets(value)
-    .map((octet, i) => {
-      const bits = octetToBinary(octet)
-      return `
-        <tr>
-          <th scope="row"><span class="byte-word">Byte </span>${i + 1}</th>
-          ${[...bits].map((bit) => `<td class="bit ${bit === '1' ? 'bit-on' : ''}">${bit}</td>`).join('')}
-          <td class="dec">${octet}</td>
-          <td class="sum">${sums[i]}</td>
-        </tr>`
-    })
-    .join('')
-  return `
-    <h3>${title}</h3>
-    <div class="table-scroll">
-      <table class="weights">
-        <thead>
-          <tr><th></th>${WEIGHTS.map((w) => `<th>${w}</th>`).join('')}<th>Dec</th><th class="sum">Som</th></tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>
-    <ol class="sums-compact">${sums.map((sum) => `<li>${sum}</li>`).join('')}</ol>`
-}
-
 export const binaryPage: Page = (root) => {
   const state = readState(PATH)
   const choice = state.params.get('richting') ?? 'willekeurig'
@@ -100,12 +68,7 @@ export const binaryPage: Page = (root) => {
       <div class="feedback-area" aria-live="polite"></div>
     </form>
 
-    <section class="panel solution" hidden>
-      <h2>Oplossing</h2>
-      ${weightTable(`IP-adres ${formatIp(ex.ip)}`, ex.ip)}
-      ${weightTable(`Subnetmasker ${formatIp(mask)}`, mask)}
-      <p>Het subnetmasker bevat <strong>${ex.prefix}</strong> enen op rij, dus de prefix is <strong>/${ex.prefix}</strong>.</p>
-    </section>`
+    <section class="panel solution" hidden aria-live="polite"></section>`
 
   const form = root.querySelector('form')!
   const feedback = root.querySelector<HTMLElement>('.feedback-area')!
@@ -119,11 +82,24 @@ export const binaryPage: Page = (root) => {
   octetInputs(form, 'ip')[0].focus()
 
   const checkOctet = toBinary ? checkBinaryOctet : checkDecimalOctet
+  const fields = [
+    ['ip', ex.ip],
+    ['mask', mask],
+  ] as const
+
+  /** Per byte het antwoord van de student als het ingevuld maar fout is, anders null. */
+  const wrongAnswers = (name: 'ip' | 'mask', value: number) => {
+    const expected = toOctets(value)
+    return octetValues(form, name).map((text, i) => {
+      const status = checkOctet(text, expected[i]).status
+      return status === 'wrong' || status === 'format' ? text.trim() : null
+    })
+  }
   form.addEventListener('submit', (e) => {
     e.preventDefault()
     clearMarks(form)
     const results: FieldResult[] = []
-    for (const [name, value] of [['ip', ex.ip], ['mask', mask]] as const) {
+    for (const [name, value] of fields) {
       const expected = toOctets(value)
       const inputs = octetInputs(form, name)
       octetValues(form, name).forEach((text, i) => {
@@ -138,7 +114,13 @@ export const binaryPage: Page = (root) => {
     feedback.innerHTML = feedbackHtml(results)
   })
 
+  // De oplossing wordt pas bij het klikken opgebouwd, zodat foute bytes van de student gemarkeerd worden.
   root.querySelector('[data-action="solution"]')!.addEventListener('click', () => {
+    solution.innerHTML = `
+      <h2>Oplossing</h2>
+      ${bitStripHtml(ex.ip, { title: `IP-adres ${formatIp(ex.ip)}`, wrongAnswers: wrongAnswers('ip', ex.ip) })}
+      ${bitStripHtml(mask, { title: `Subnetmasker ${formatIp(mask)}`, prefix: ex.prefix, wrongAnswers: wrongAnswers('mask', mask) })}
+      <p>Het subnetmasker bevat <strong>${ex.prefix}</strong> enen op rij, dus de prefix is <strong>/${ex.prefix}</strong>.</p>`
     solution.hidden = false
     solution.scrollIntoView({ behavior: 'smooth', block: 'start' })
   })

@@ -20,6 +20,7 @@
   --ok-bg: #e0f4f2;
   --err: #c82333;
   --err-bg: #fbe7e9;
+  --bit-off: #edf2f5;
   --shadow: 0 1px 2px rgb(28 29 30 / 0.04), 0 4px 16px rgb(28 29 30 / 0.06);
   --radius: 16px;
   --font-body: 'Open Sans Variable', 'Open Sans', Arial, Verdana, sans-serif;
@@ -48,6 +49,7 @@
     --ok-bg: #10302e;
     --err: #ff7b86;
     --err-bg: #3a1a1e;
+    --bit-off: #2a2e32;
     --shadow: none;
   }
 }
@@ -443,54 +445,167 @@ input.is-empty {
   font-size: 1.05rem;
 }
 
-.table-scroll {
-  overflow-x: auto;
+/* Bitstrook: 4 bytes naast elkaar met gewichten, bits, decimaal en som. */
+
+.bitstrip {
+  margin: 1.5rem 0 0;
 }
 
-table.weights {
-  border-collapse: collapse;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-}
-
-table.weights th,
-table.weights td {
-  padding: 0.35rem 0.6rem;
-  border: 1px solid var(--border);
-  text-align: center;
-}
-
-table.weights thead th {
-  color: var(--muted);
-  font-weight: 600;
-  background: var(--bg);
-}
-
-table.weights tbody th {
-  font-family: var(--font-body);
-  font-weight: 700;
-  text-align: left;
-  white-space: nowrap;
-}
-
-td.bit-on {
-  background: var(--brand-soft);
+.bitstrip figcaption {
+  margin-bottom: 0.6rem;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.05rem;
   color: var(--heading);
-  font-weight: 800;
 }
 
-td.dec {
-  font-weight: 800;
+.bs-bytes {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.25rem 1.6rem;
 }
 
-td.sum {
-  text-align: left;
+.bs-byte {
+  min-width: 0;
+  padding: 0.35rem;
+  border: 2px solid transparent;
+  border-radius: 10px;
+}
+
+.bs-row {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+}
+
+.bs-weights span {
+  padding-bottom: 0.2rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-align: center;
   color: var(--muted);
-  white-space: nowrap;
+  letter-spacing: -0.03em;
 }
 
-.sums-compact {
-  display: none;
+.bs-bits,
+.bs-dec {
+  position: relative;
+}
+
+.bs-bits span {
+  padding: 0.4rem 0;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  text-align: center;
+  border-right: 1px solid var(--surface);
+}
+
+.bs-bits span:first-child {
+  border-radius: 6px 0 0 6px;
+}
+
+.bs-bits span:last-child {
+  border-right: 0;
+  border-radius: 0 6px 6px 0;
+}
+
+.bs-bits .on {
+  background: var(--brand);
+  color: #1c1d1e;
+}
+
+.bs-bits .off {
+  background: var(--bit-off);
+  color: var(--muted);
+}
+
+/* De punt tussen twee bytes, op de hoogte van de bits en van het decimale getal. */
+.bs-byte:not(:last-child) .bs-bits::after,
+.bs-byte:not(:last-child) .bs-dec::after {
+  content: '.';
+  position: absolute;
+  right: -1.35rem;
+  bottom: 0.1em;
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--heading);
+}
+
+.bs-bar {
+  gap: 0;
+  height: 6px;
+  margin-top: 4px;
+}
+
+.bs-bar .net,
+.bs-key.net {
+  background: var(--link);
+}
+
+.bs-bar .host,
+.bs-key.host {
+  background: var(--border);
+}
+
+.bs-bar span:first-child {
+  border-radius: 3px 0 0 3px;
+}
+
+.bs-bar span:last-child {
+  border-radius: 0 3px 3px 0;
+}
+
+.bs-dec {
+  margin-top: 0.35rem;
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--heading);
+}
+
+.bs-sum {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-align: center;
+  color: var(--muted);
+}
+
+.bs-wrong {
+  border-color: var(--err);
+  background: var(--err-bg);
+}
+
+.bs-yours {
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--err);
+  overflow-wrap: anywhere;
+}
+
+.bs-split {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.75rem 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.bs-key {
+  display: inline-block;
+  width: 1.5rem;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.bs-key.host {
+  margin-left: 0.75rem;
 }
 
 /* ---------- Footer ---------- */
@@ -600,17 +715,19 @@ td.sum {
     white-space: normal;
   }
 
-  table.weights .sum {
-    display: none;
+  .bs-bytes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .bs-byte {
+    padding: 0.2rem;
   }
 
-  .sums-compact {
-    display: block;
-    margin: 0.5rem 0 0;
-    padding-left: 1.5rem;
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-    color: var(--muted);
+  .bs-weights span {
+    font-size: 0.6rem;
+    letter-spacing: -0.07em;
   }
 }
 
@@ -669,17 +786,16 @@ td.sum {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.5rem 0.25rem;
   }
+}
 
-  table.weights {
-    font-size: 0.85rem;
+/* Heel smalle gsm: één byte per rij, anders worden de vakjes te klein. */
+@media (max-width: 370px) {
+  .bs-bytes {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  table.weights th,
-  table.weights td {
-    padding: 0.3rem;
-  }
-
-  table.weights .byte-word {
+  .bs-byte:not(:last-child) .bs-bits::after,
+  .bs-byte:not(:last-child) .bs-dec::after {
     display: none;
   }
 }
