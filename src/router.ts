@@ -13,3 +13,9 @@ export function startRouter(root: HTMLElement, routes: Record<string, Page>, not
   window.addEventListener('hashchange', render)
   render()
 }
+
+/** Queryparameter uit de hash, bv. seed uit "#/analyse?seed=123". */
+export function getHashParam(name: string): string | null {
+  const query = location.hash.split('?')[1] ?? ''
+  return new URLSearchParams(query).get(name)
+}
