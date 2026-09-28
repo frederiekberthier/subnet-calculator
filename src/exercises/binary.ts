@@ -6,7 +6,7 @@ import { bitStripHtml } from '../ui/bitstrip'
 import { clearMarks, feedbackHtml, levelSelectHtml, markField, readState, wireToolbar } from '../ui/exercise'
 import { octetInputs, octetInputsHtml, octetValues, wireOctetInputs } from '../ui/octets'
 
-const PATH = '/binair'
+const PATH = '/omrekenen'
 const DIRECTIONS: Record<string, string> = {
   willekeurig: 'Willekeurig',
   dec2bin: 'Decimaal → binair',
@@ -24,7 +24,8 @@ export const binaryPage: Page = (root) => {
   const show = (v: number) => (toBinary ? formatIp(v) : formatBinary(v)).replaceAll('.', '.<wbr>')
 
   root.innerHTML = `
-    <h1>1. Binair ↔ decimaal</h1>
+    <h1>1. Omrekenen</h1>
+    <p class="subtitle">binair ↔ decimaal</p>
     <p class="lead">
       ${
         toBinary

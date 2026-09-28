@@ -13,7 +13,7 @@ startRouter(
   document.querySelector<HTMLElement>('#app')!,
   {
     '/': homePage,
-    '/binair': binaryPage,
+    '/omrekenen': binaryPage,
     '/analyse': analyzePage,
     '/subnetten': subnetPage,
   },

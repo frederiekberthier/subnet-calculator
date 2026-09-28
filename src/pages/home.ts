@@ -2,8 +2,8 @@ import type { Page } from '../router'
 
 const exercises = [
   {
-    href: '#/binair',
-    title: 'Binair ↔ decimaal',
+    href: '#/omrekenen',
+    title: 'Omrekenen',
     text: 'Zet een IPv4-adres en subnetmasker om van decimaal naar binair en omgekeerd.',
   },
   {

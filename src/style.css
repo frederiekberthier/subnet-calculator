@@ -157,6 +157,14 @@ main {
   padding: 2rem 1.25rem 3rem;
 }
 
+.subtitle {
+  margin: -0.25rem 0 0.75rem;
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--link);
+}
+
 .lead {
   color: var(--muted);
   max-width: 65ch;
