@@ -5,6 +5,8 @@ import { binaryPage } from './exercises/binary'
 import { analyzePage } from './exercises/analyze'
 import { subnetPage } from './exercises/subnet'
 
+document.querySelector('#year')!.textContent = String(new Date().getFullYear())
+
 startRouter(
   document.querySelector<HTMLElement>('#app')!,
   {
