@@ -202,3 +202,18 @@ describe('adresanalyse: nooit een speciaal adres (issue #12)', () => {
     })
   }
 })
+
+describe('oefening 3: klassen gelijk verdeeld (issue #20)', () => {
+  for (const level of [2, 3] as const) {
+    it(`niveau ${level}: klasse A, B en C elk ongeveer een derde`, () => {
+      const rng = createRng(2000 + level)
+      const count: Record<string, number> = { A: 0, B: 0, C: 0 }
+      const N = 6000
+      for (let i = 0; i < N; i++) count[getClass(generateSubnet(rng, level).network)]++
+      for (const cls of ['A', 'B', 'C']) {
+        expect(count[cls] / N, `klasse ${cls}`).toBeGreaterThan(0.28)
+        expect(count[cls] / N, `klasse ${cls}`).toBeLessThan(0.39)
+      }
+    })
+  }
+})

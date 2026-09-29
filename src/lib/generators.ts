@@ -162,10 +162,12 @@ function chooseIndices(rng: Rng, count: number): number[] {
 
 export function generateSubnet(rng: Rng, level: Level): SubnetExercise {
   const settings = SUBNET_SETTINGS[level]
-  const prefix = rng.pick(settings.prefixes)
-  // Enkel klassen waarvoor deze prefix geen supernetting is (zie isSubnettingAllowed); planSubnets controleert dit nog eens.
-  const classes = level === 1 ? (['C'] as const) : (['A', 'B', 'C'] as const).filter((c) => defaultPrefix(c)! <= prefix)
-  const network = networkAddress(randomAddress(rng, rng.pick(classes)), prefix)
+  // Eerst de klasse (gelijk verdeeld), dan een prefix die voor die klasse geen supernetting is
+  // (zie isSubnettingAllowed; planSubnets controleert dit nog eens). Andersom kwam klasse C op
+  // niveau Expert maar in ±5% van de opgaves voor (issue #20).
+  const cls = level === 1 ? 'C' : rng.pick(['A', 'B', 'C'] as const)
+  const prefix = rng.pick(settings.prefixes.filter((p) => p >= defaultPrefix(cls)!))
+  const network = networkAddress(randomAddress(rng, cls), prefix)
   const maxBits = Math.min(MAX_USABLE_PREFIX - prefix, Math.log2(settings.maxRequested))
   // Meestal geen macht van 2, zodat de student moet afronden naar boven.
   const requested = rng.chance(0.3) ? 2 ** rng.int(1, maxBits) : rng.int(3, 2 ** maxBits - 1)
