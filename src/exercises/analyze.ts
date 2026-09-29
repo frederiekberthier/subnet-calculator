@@ -4,7 +4,7 @@ import { formatIp, prefixToMask, toOctets } from '../lib/ipv4'
 import type { Page } from '../router'
 import { andTableHtml } from '../ui/andtable'
 import { choiceGroup, choiceHtml, choiceValue } from '../ui/choice'
-import { clearMarks, focusAfterNew, formatCount, levelSelectHtml, readState, showFeedback, showSolution, wireToolbar } from '../ui/exercise'
+import { clearMarks, focusAfterNew, formatCount, levelSelectHtml, outdatedNoticeHtml, readState, showFeedback, showSolution, wireToolbar } from '../ui/exercise'
 import { octetInputs, octetInputsHtml, wireOctetInputs } from '../ui/octets'
 import { addressAnswer, fieldAnswer, overviewHtml, type Answer } from '../ui/overview'
 
@@ -45,6 +45,7 @@ export const analyzePage: Page = (root) => {
       ${levelSelectHtml(state.level)}
       <button type="button" class="btn" data-action="new">Nieuwe oefening</button>
     </div>
+    ${outdatedNoticeHtml(state)}
 
     <div class="panel assignment">
       <div><span class="assignment-label">IP-adres</span><span class="assignment-value mono">${formatIp(ex.ip)}</span></div>

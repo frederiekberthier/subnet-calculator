@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { generateAnalyze, generateBinary, generateSubnet, isSpecial, LEVELS, randomAddress } from '../src/lib/generators'
+import {
+  GENERATOR_VERSION,
+  generateAnalyze,
+  generateBinary,
+  generateSubnet,
+  isSpecial,
+  LEVELS,
+  randomAddress,
+} from '../src/lib/generators'
 import {
   broadcastAddress,
   defaultPrefix,
@@ -216,4 +224,23 @@ describe('oefening 3: klassen gelijk verdeeld (issue #20)', () => {
       }
     })
   }
+})
+
+// Faalt deze test? Dan geeft dezelfde seed een andere opgave, en tonen al gedeelde links iets anders.
+// Verhoog dan GENERATOR_VERSION in src/lib/generators.ts en werk de snapshot bij met `npx vitest -u` (issue #22).
+describe('vaste opgaves per seed', () => {
+  it(`generatorversie ${GENERATOR_VERSION}`, () => {
+    const out: string[] = []
+    for (const level of LEVELS) {
+      for (let seed = 1; seed <= 5; seed++) {
+        const b = generateBinary(createRng(seed), level)
+        const a = generateAnalyze(createRng(seed), level)
+        const s = generateSubnet(createRng(seed), level)
+        out.push(
+          `n${level} s${seed}: bin ${b.ip}/${b.prefix} ${b.direction} | ana ${a.ip}/${a.prefix} ${a.maskNotation} | sub ${s.network}/${s.prefix} x${s.requested} [${s.askIndices}] ${s.maskNotation}`,
+        )
+      }
+    }
+    expect(out).toMatchSnapshot()
+  })
 })

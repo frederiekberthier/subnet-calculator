@@ -3,7 +3,7 @@ import { generateSubnet } from '../lib/generators'
 import { formatIp, interestingOctet, magicNumber, prefixToMask, subnetAt, toOctets, type NetworkInfo } from '../lib/ipv4'
 import type { Page } from '../router'
 import { andTableHtml } from '../ui/andtable'
-import { clearMarks, focusAfterNew, formatCount as fmt, levelSelectHtml, readState, showFeedback, showSolution, wireToolbar } from '../ui/exercise'
+import { clearMarks, focusAfterNew, formatCount as fmt, levelSelectHtml, outdatedNoticeHtml, readState, showFeedback, showSolution, wireToolbar } from '../ui/exercise'
 import { octetInputsHtml, wireOctetInputs } from '../ui/octets'
 import { addressAnswer, fieldAnswer, overviewHtml, type Answer } from '../ui/overview'
 
@@ -44,6 +44,7 @@ export const subnetPage: Page = (root) => {
       ${levelSelectHtml(state.level)}
       <button type="button" class="btn" data-action="new">Nieuwe oefening</button>
     </div>
+    ${outdatedNoticeHtml(state)}
 
     <div class="panel assignment">
       <div><span class="assignment-label">Netwerk</span><span class="assignment-value mono">${formatIp(ex.network)}</span></div>

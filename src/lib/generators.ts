@@ -15,6 +15,14 @@ import {
 } from './ipv4'
 import type { Rng } from './random'
 
+/**
+ * Versie van de opgavegenerators. Staat als &v=... in elke link, zodat een gedeelde link die met een
+ * oudere versie gemaakt is een melding toont (dezelfde seed kan dan een andere opgave geven, issue #22).
+ * Verhoog dit getal bij ELKE wijziging die de opgave voor een seed verandert; de snapshot-test in
+ * tests/generators.test.ts faalt tot dan.
+ */
+export const GENERATOR_VERSION = 2
+
 /** 1 = classful (/8, /16, /24), 2 = grens in het laatste octet (/24-/30), 3 = willekeurige prefix. */
 export type Level = 1 | 2 | 3
 

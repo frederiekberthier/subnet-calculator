@@ -3,7 +3,7 @@ import { generateBinary, type Direction } from '../lib/generators'
 import { formatBinary, formatIp, prefixToMask, toOctets } from '../lib/ipv4'
 import type { Page } from '../router'
 import { bitStripHtml } from '../ui/bitstrip'
-import { clearMarks, focusAfterNew, levelSelectHtml, markField, readState, showFeedback, showSolution, wireToolbar } from '../ui/exercise'
+import { clearMarks, focusAfterNew, levelSelectHtml, outdatedNoticeHtml, markField, readState, showFeedback, showSolution, wireToolbar } from '../ui/exercise'
 import { octetInputs, octetInputsHtml, octetValues, wireOctetInputs } from '../ui/octets'
 
 const PATH = '/omrekenen'
@@ -46,6 +46,7 @@ export const binaryPage: Page = (root) => {
       </label>
       <button type="button" class="btn" data-action="new">Nieuwe oefening</button>
     </div>
+    ${outdatedNoticeHtml(state)}
 
     <form class="panel exercise" novalidate>
       <div class="qa">

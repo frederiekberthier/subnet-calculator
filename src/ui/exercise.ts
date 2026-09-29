@@ -1,6 +1,6 @@
 // Gedeelde bouwstenen voor de oefenpagina's: instellingen in de URL, werkbalk en veldfeedback.
 import type { FieldResult } from '../lib/check'
-import { LEVEL_NAMES, LEVELS, type Level } from '../lib/generators'
+import { GENERATOR_VERSION, LEVEL_NAMES, LEVELS, type Level } from '../lib/generators'
 import { createRng, parseSeed, randomSeed, type Rng } from '../lib/random'
 
 export interface ExerciseState {
@@ -9,6 +9,8 @@ export interface ExerciseState {
   seed: number
   level: Level
   rng: Rng
+  /** De link werd gemaakt met een andere generatorversie: de opgave kan verschillen van wat gedeeld werd. */
+  outdated: boolean
 }
 
 /** Instellingen die over de oefeningen heen onthouden worden (per browsertab) als ze niet in de link staan. */
@@ -50,6 +52,9 @@ export function readState(path: string, settings: readonly string[] = ['niveau']
     seed = randomSeed()
     params.set('seed', String(seed))
   }
+  const version = params.get('v')
+  const outdated = version !== null && version !== String(GENERATOR_VERSION)
+  params.set('v', String(GENERATOR_VERSION))
   const n = Number(params.get('niveau'))
   const level: Level = LEVELS.includes(n as Level) ? (n as Level) : 1
   params.set('niveau', String(level))
@@ -58,7 +63,7 @@ export function readState(path: string, settings: readonly string[] = ['niveau']
     // replaceState triggert geen hashchange, dus geen dubbele render.
     history.replaceState(null, '', `#${path}?${params}`)
   }
-  return { path, params, seed, level, rng: createRng(seed) }
+  return { path, params, seed, level, rng: createRng(seed), outdated }
 }
 
 /** Staat de focus na de volgende render op het eerste invoervak? Enkel na "Nieuwe oefening" of een instelling. */
@@ -81,6 +86,14 @@ export function goToNew(state: ExerciseState, changes: Record<string, string> = 
   for (const [k, v] of Object.entries(changes)) params.set(k, v)
   params.set('seed', String(randomSeed()))
   location.hash = `#${state.path}?${params}`
+}
+
+/** Melding als een gedeelde link met een oudere versie van de site gemaakt werd. */
+export function outdatedNoticeHtml(state: ExerciseState): string {
+  return state.outdated
+    ? `<p class="notice" role="status">Deze link werd met een oudere versie van de site gemaakt. De opgave kan
+       daardoor verschillen van de opgave die gedeeld werd.</p>`
+    : ''
 }
 
 export function levelSelectHtml(level: Level): string {
