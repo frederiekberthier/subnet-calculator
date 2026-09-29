@@ -10,10 +10,12 @@ import {
   hostCount,
   interestingOctet,
   isPrivate,
+  isSubnettingAllowed,
   isValidMask,
   lastHost,
   magicNumber,
   maskToPrefix,
+  minPrefix,
   networkAddress,
   networkInfo,
   parseBinaryIp,
@@ -213,5 +215,34 @@ describe('subnetten (FLSM)', () => {
     expect(magicNumber(24)).toBe(1)
     expect(magicNumber(26)).toBe(64)
     expect(magicNumber(12)).toBe(16)
+  })
+})
+
+describe('geen supernetting (enkel subnetting)', () => {
+  it('minPrefix is de standaardprefix van de klasse', () => {
+    expect(minPrefix(ip('10.1.2.3'))).toBe(8)
+    expect(minPrefix(ip('172.16.0.1'))).toBe(16)
+    expect(minPrefix(ip('192.168.1.1'))).toBe(24)
+    expect(minPrefix(ip('224.0.0.1'))).toBeNull()
+    expect(minPrefix(ip('240.0.0.1'))).toBeNull()
+  })
+
+  it('isSubnettingAllowed: tussen standaardprefix en /30', () => {
+    expect(isSubnettingAllowed(ip('192.168.1.0'), 24)).toBe(true)
+    expect(isSubnettingAllowed(ip('192.168.1.0'), 30)).toBe(true)
+    expect(isSubnettingAllowed(ip('192.168.1.0'), 22)).toBe(false) // supernetting
+    expect(isSubnettingAllowed(ip('192.168.1.0'), 31)).toBe(false) // geen bruikbare adressen
+    expect(isSubnettingAllowed(ip('172.16.0.0'), 16)).toBe(true)
+    expect(isSubnettingAllowed(ip('172.16.0.0'), 12)).toBe(false)
+    expect(isSubnettingAllowed(ip('10.0.0.0'), 8)).toBe(true)
+    expect(isSubnettingAllowed(ip('10.0.0.0'), 7)).toBe(false)
+    expect(isSubnettingAllowed(ip('224.0.0.0'), 24)).toBe(false) // klasse D
+  })
+
+  it('planSubnets weigert een gesupernet startnetwerk', () => {
+    expect(() => planSubnets(ip('192.168.0.0'), 22, 4)).toThrow()
+    expect(() => planSubnets(ip('172.16.0.0'), 12, 4)).toThrow()
+    expect(() => planSubnets(ip('224.0.0.0'), 24, 2)).toThrow()
+    expect(planSubnets(ip('192.168.0.0'), 24, 4).newPrefix).toBe(26)
   })
 })

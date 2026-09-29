@@ -179,6 +179,21 @@ export function defaultPrefix(cls: IpClass): number | null {
   return { A: 8, B: 16, C: 24, D: null, E: null }[cls]
 }
 
+// In de opleiding wordt enkel gesubnet, nooit gesupernet: de prefix is nooit korter dan de
+// standaardprefix van de klasse (A /8, B /16, C /24). Samen met het maximum van /30 is dit
+// DE regel voor elke opgave; alle generators en de subnetberekening gebruiken deze functies.
+
+/** Kleinst toegelaten prefix voor dit adres (standaardprefix van de klasse), null voor klasse D/E. */
+export function minPrefix(ip: number): number | null {
+  return defaultPrefix(getClass(ip))
+}
+
+/** Is ip/prefix toegelaten in een opgave: geen supernetting en nog bruikbare adressen (max /30)? */
+export function isSubnettingAllowed(ip: number, prefix: number): boolean {
+  const min = minPrefix(ip)
+  return min !== null && prefix >= min && prefix <= MAX_USABLE_PREFIX
+}
+
 const PRIVATE_RANGES: ReadonlyArray<[number, number]> = [
   [0x0a000000, 8], // 10.0.0.0/8
   [0xac100000, 12], // 172.16.0.0/12
@@ -203,6 +218,9 @@ export function bitsNeeded(n: number): number {
  * Gooit een fout als de nieuwe prefix groter dan /30 zou worden.
  */
 export function planSubnets(ip: number, prefix: number, requested: number): SubnetPlan {
+  if (!isSubnettingAllowed(ip, prefix)) {
+    throw new RangeError(`Niet toegelaten: ${formatCidr(networkAddress(ip, prefix), prefix)} is supernetting of heeft geen bruikbare adressen`)
+  }
   const borrowedBits = bitsNeeded(requested)
   const newPrefix = prefix + borrowedBits
   if (newPrefix > MAX_USABLE_PREFIX) {

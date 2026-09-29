@@ -2,6 +2,7 @@
 import {
   MAX_USABLE_PREFIX,
     defaultPrefix,
+  minPrefix,
   fromOctets,
   getClass,
   isPrivate,
@@ -90,13 +91,17 @@ export function randomAddress(rng: Rng, cls: 'A' | 'B' | 'C' = rng.pick(['A', 'B
   }
 }
 
-/** Prefix volgens niveau. Bij niveau 1 hoort de prefix bij de klasse van het adres. */
+/**
+ * Prefix volgens niveau, altijd binnen de regel van isSubnettingAllowed:
+ * tussen de standaardprefix van de klasse (nooit supernetting) en /30.
+ */
 function prefixFor(rng: Rng, level: Level, ip: number): number {
-  if (level === 1) return defaultPrefix(getClass(ip))!
-  if (level === 2) return rng.int(24, MAX_USABLE_PREFIX)
+  const min = minPrefix(ip)!
+  if (level === 1) return min
+  if (level === 2) return rng.int(Math.max(24, min), MAX_USABLE_PREFIX)
   // Niveau 3: bij voorkeur een grens midden in een octet, dat is het interessantste.
   for (;;) {
-    const p = rng.int(8, MAX_USABLE_PREFIX)
+    const p = rng.int(min, MAX_USABLE_PREFIX)
     if (p % 8 !== 0 || rng.chance(0.15)) return p
   }
 }
@@ -149,7 +154,7 @@ function chooseIndices(rng: Rng, count: number): number[] {
 export function generateSubnet(rng: Rng, level: Level): SubnetExercise {
   const settings = SUBNET_SETTINGS[level]
   const prefix = rng.pick(settings.prefixes)
-  // Enkel klassen waarvan de standaardprefix niet groter is dan de gegeven prefix (een /12 in klasse C oogt vreemd).
+  // Enkel klassen waarvoor deze prefix geen supernetting is (zie isSubnettingAllowed); planSubnets controleert dit nog eens.
   const classes = level === 1 ? (['C'] as const) : (['A', 'B', 'C'] as const).filter((c) => defaultPrefix(c)! <= prefix)
   const network = networkAddress(randomAddress(rng, rng.pick(classes)), prefix)
   const maxBits = Math.min(MAX_USABLE_PREFIX - prefix, Math.log2(settings.maxRequested))

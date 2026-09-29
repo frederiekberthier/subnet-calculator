@@ -5,6 +5,7 @@ import {
   defaultPrefix,
   getClass,
   isPrivate,
+  isSubnettingAllowed,
   MAX_USABLE_PREFIX,
   networkAddress,
 } from '../src/lib/ipv4'
@@ -138,5 +139,38 @@ describe('generateSubnet', () => {
       if (n & (n - 1)) nonPow++
     }
     expect(nonPow / RUNS).toBeGreaterThan(0.5)
+  })
+})
+
+// Harde regel uit de opleiding: nooit supernetting, en nooit voorbij /30.
+describe('geen enkele opgave bevat supernetting', () => {
+  const N = 5000
+  for (const level of LEVELS) {
+    it(`niveau ${level}: oefening 1, 2 en 3`, () => {
+      const rng = createRng(9000 + level)
+      for (let i = 0; i < N; i++) {
+        const b = generateBinary(rng, level)
+        expect(isSubnettingAllowed(b.ip, b.prefix), `oef1 ${b.ip}/${b.prefix}`).toBe(true)
+        const a = generateAnalyze(rng, level)
+        expect(isSubnettingAllowed(a.ip, a.prefix), `oef2 ${a.ip}/${a.prefix}`).toBe(true)
+        const s = generateSubnet(rng, level)
+        expect(isSubnettingAllowed(s.network, s.prefix), `oef3 ${s.network}/${s.prefix}`).toBe(true)
+        expect(isSubnettingAllowed(s.network, s.plan.newPrefix), `oef3 nieuw /${s.plan.newPrefix}`).toBe(true)
+      }
+    })
+  }
+
+  it('Expert gebruikt nog steeds prefixen binnen elke klasse (niet enkel de standaardprefix)', () => {
+    const rng = createRng(77)
+    const perClass: Record<string, Set<number>> = { A: new Set(), B: new Set(), C: new Set() }
+    for (let i = 0; i < N; i++) {
+      const a = generateAnalyze(rng, 3)
+      perClass[getClass(a.ip)].add(a.prefix)
+    }
+    expect(Math.min(...perClass.A)).toBe(8)
+    expect(Math.min(...perClass.B)).toBe(16)
+    expect(Math.min(...perClass.C)).toBe(24)
+    expect(perClass.A.size).toBeGreaterThan(15)
+    expect(Math.max(...perClass.C)).toBe(30)
   })
 })
