@@ -5,7 +5,8 @@ export function startRouter(root: HTMLElement, routes: Record<string, Page>, not
   const render = () => {
     const path = location.hash.replace(/^#/, '').split('?')[0] || '/'
     root.replaceChildren()
-    ;(routes[path] ?? notFound)(root)
+    // Object.hasOwn: anders worden namen als #hasOwnProperty of #constructor als route gezien (issue #13).
+    ;(Object.hasOwn(routes, path) ? routes[path] : notFound)(root)
     document.querySelectorAll<HTMLAnchorElement>('.site-header nav a').forEach((a) => {
       a.classList.toggle('active', a.getAttribute('href') === `#${path}`)
     })
