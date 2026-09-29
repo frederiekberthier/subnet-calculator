@@ -1,5 +1,6 @@
 // Horizontale bitstrook: de 4 bytes naast elkaar, zoals in de les op het bord.
 // Per byte: gewichten (128 ... 1), de bits, het decimale getal en de som.
+import { escapeHtml } from '../lib/html'
 import { octetToBinary, toOctets } from '../lib/ipv4'
 
 const WEIGHTS = [128, 64, 32, 16, 8, 4, 2, 1]
@@ -29,7 +30,7 @@ export function bitStripHtml(value: number, { title, prefix, wrongAnswers = [] }
           ${bar}
           <div class="bs-dec">${octet}</div>
           <div class="bs-sum">${terms.length ? terms.join('+') : '0'}</div>
-          ${wrong !== null && wrong !== undefined ? `<div class="bs-yours">jij: <span class="mono">${wrong}</span></div>` : ''}
+          ${wrong !== null && wrong !== undefined ? `<div class="bs-yours">jij: <span class="mono">${escapeHtml(wrong)}</span></div>` : ''}
         </div>`
     })
     .join('')
