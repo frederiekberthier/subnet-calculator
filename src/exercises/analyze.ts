@@ -4,7 +4,7 @@ import { formatIp, prefixToMask, toOctets } from '../lib/ipv4'
 import type { Page } from '../router'
 import { andTableHtml } from '../ui/andtable'
 import { choiceGroup, choiceHtml, choiceValue } from '../ui/choice'
-import { clearMarks, feedbackHtml, formatCount, levelSelectHtml, readState, wireToolbar } from '../ui/exercise'
+import { clearMarks, feedbackHtml, formatCount, levelSelectHtml, readState, showSolution, wireToolbar } from '../ui/exercise'
 import { octetInputs, octetInputsHtml, wireOctetInputs } from '../ui/octets'
 import { addressAnswer, fieldAnswer, overviewHtml, type Answer } from '../ui/overview'
 
@@ -122,9 +122,11 @@ export const analyzePage: Page = (root) => {
     e.preventDefault()
     clearMarks(form)
     feedback.innerHTML = feedbackHtml(evaluate(true).map((a) => a.result))
+    // Een zichtbare oplossing mee bijwerken, anders toont ze nog de vorige antwoorden (issue #3).
+    if (!solution.hidden) renderSolution()
   })
 
-  root.querySelector('[data-action="solution"]')!.addEventListener('click', () => {
+  const renderSolution = () => {
     const answers = evaluate(false)
     const hostBits = 32 - ex.prefix
     const first = toOctets(ex.ip)[0]
@@ -160,7 +162,10 @@ export const analyzePage: Page = (root) => {
             : 'het adres ligt niet in een van de privébereiken, dus het is publiek.'
         } Privébereiken: 10.0.0.0/8, 172.16.0.0/12 en 192.168.0.0/16.</li>
       </ol>`
-    solution.hidden = false
-    solution.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  root.querySelector('[data-action="solution"]')!.addEventListener('click', () => {
+    renderSolution()
+    showSolution(solution)
   })
 }

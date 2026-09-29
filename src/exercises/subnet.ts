@@ -3,7 +3,7 @@ import { generateSubnet } from '../lib/generators'
 import { formatIp, interestingOctet, magicNumber, prefixToMask, subnetAt, toOctets, type NetworkInfo } from '../lib/ipv4'
 import type { Page } from '../router'
 import { andTableHtml } from '../ui/andtable'
-import { clearMarks, feedbackHtml, formatCount as fmt, levelSelectHtml, readState, wireToolbar } from '../ui/exercise'
+import { clearMarks, feedbackHtml, formatCount as fmt, levelSelectHtml, readState, showSolution, wireToolbar } from '../ui/exercise'
 import { octetInputsHtml, wireOctetInputs } from '../ui/octets'
 import { addressAnswer, fieldAnswer, overviewHtml, type Answer } from '../ui/overview'
 
@@ -123,9 +123,11 @@ export const subnetPage: Page = (root) => {
     e.preventDefault()
     clearMarks(form)
     feedback.innerHTML = feedbackHtml(evaluate(true).map((a) => a.result))
+    // Een zichtbare oplossing mee bijwerken, anders toont ze nog de vorige antwoorden (issue #3).
+    if (!solution.hidden) renderSolution()
   })
 
-  root.querySelector('[data-action="solution"]')!.addEventListener('click', () => {
+  const renderSolution = () => {
     const answers = evaluate(false)
     const n = plan.borrowedBits
     const byte = interestingOctet(plan.newPrefix)
@@ -192,7 +194,10 @@ export const subnetPage: Page = (root) => {
           : table
       }
       <p class="muted small">De gevraagde subnetten zijn gemarkeerd.</p>`
-    solution.hidden = false
-    solution.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  root.querySelector('[data-action="solution"]')!.addEventListener('click', () => {
+    renderSolution()
+    showSolution(solution)
   })
 }

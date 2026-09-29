@@ -89,3 +89,9 @@ export function feedbackHtml(results: FieldResult[]): string {
 export function formatCount(n: number): string {
   return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f')
 }
+
+/** Toon de (net opgebouwde) oplossing en scroll ernaartoe. */
+export function showSolution(solution: HTMLElement): void {
+  solution.hidden = false
+  solution.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}

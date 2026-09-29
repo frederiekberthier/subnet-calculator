@@ -3,7 +3,7 @@ import { generateBinary, type Direction } from '../lib/generators'
 import { formatBinary, formatIp, prefixToMask, toOctets } from '../lib/ipv4'
 import type { Page } from '../router'
 import { bitStripHtml } from '../ui/bitstrip'
-import { clearMarks, feedbackHtml, levelSelectHtml, markField, readState, wireToolbar } from '../ui/exercise'
+import { clearMarks, feedbackHtml, levelSelectHtml, markField, readState, showSolution, wireToolbar } from '../ui/exercise'
 import { octetInputs, octetInputsHtml, octetValues, wireOctetInputs } from '../ui/octets'
 
 const PATH = '/omrekenen'
@@ -113,16 +113,21 @@ export const binaryPage: Page = (root) => {
     markField(prefixInput, r)
     results.push(r)
     feedback.innerHTML = feedbackHtml(results)
+    // Een zichtbare oplossing mee bijwerken, anders toont ze nog de vorige antwoorden (issue #3).
+    if (!solution.hidden) renderSolution()
   })
 
   // De oplossing wordt pas bij het klikken opgebouwd, zodat foute bytes van de student gemarkeerd worden.
-  root.querySelector('[data-action="solution"]')!.addEventListener('click', () => {
+  const renderSolution = () => {
     solution.innerHTML = `
       <h2>Oplossing</h2>
       ${bitStripHtml(ex.ip, { title: `IP-adres ${formatIp(ex.ip)}`, wrongAnswers: wrongAnswers('ip', ex.ip) })}
       ${bitStripHtml(mask, { title: `Subnetmasker ${formatIp(mask)}`, prefix: ex.prefix, wrongAnswers: wrongAnswers('mask', mask) })}
       <p>Het subnetmasker bevat <strong>${ex.prefix}</strong> enen op rij, dus de prefix is <strong>/${ex.prefix}</strong>.</p>`
-    solution.hidden = false
-    solution.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  root.querySelector('[data-action="solution"]')!.addEventListener('click', () => {
+    renderSolution()
+    showSolution(solution)
   })
 }
