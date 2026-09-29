@@ -11,21 +11,53 @@ export interface ExerciseState {
   rng: Rng
 }
 
+/** Instellingen die over de oefeningen heen onthouden worden (per browsertab) als ze niet in de link staan. */
+const REMEMBERED = ['niveau', 'richting'] as const
+
+function remembered(key: string): string | null {
+  try {
+    return sessionStorage.getItem(`subnetting.${key}`)
+  } catch {
+    return null // bv. privévenster of opslag geblokkeerd: dan gewoon de standaard
+  }
+}
+
+function remember(key: string, value: string): void {
+  try {
+    sessionStorage.setItem(`subnetting.${key}`, value)
+  } catch {
+    // niet erg: enkel een gemak
+  }
+}
+
 /**
- * Leest seed en niveau uit de hash (#/pad?seed=..&niveau=..).
- * Zonder seed wordt er een gekozen en in de URL gezet, zodat de opgave altijd deelbaar is.
+ * Leest seed en instellingen uit de hash (#/pad?seed=..&niveau=..).
+ * - Instellingen die niet in de link staan, komen uit wat de student eerder koos (issue #5).
+ * - Seed en niveau worden altijd in de URL gezet, zodat een gedeelde link overal dezelfde opgave geeft.
  */
-export function readState(path: string): ExerciseState {
-  const params = new URLSearchParams(location.hash.split('?')[1] ?? '')
+export function readState(path: string, settings: readonly string[] = ['niveau']): ExerciseState {
+  const before = location.hash.split('?')[1] ?? ''
+  const params = new URLSearchParams(before)
+  for (const key of REMEMBERED.filter((k) => settings.includes(k))) {
+    const value = params.get(key) ?? remembered(key)
+    if (value !== null) {
+      params.set(key, value)
+      if (key !== 'niveau') remember(key, value)
+    }
+  }
   let seed = parseSeed(params.get('seed'))
   if (seed === null) {
     seed = randomSeed()
     params.set('seed', String(seed))
-    // replaceState triggert geen hashchange, dus geen dubbele render.
-    history.replaceState(null, '', `#${path}?${params}`)
   }
   const n = Number(params.get('niveau'))
   const level: Level = LEVELS.includes(n as Level) ? (n as Level) : 1
+  params.set('niveau', String(level))
+  remember('niveau', String(level))
+  if (params.toString() !== before) {
+    // replaceState triggert geen hashchange, dus geen dubbele render.
+    history.replaceState(null, '', `#${path}?${params}`)
+  }
   return { path, params, seed, level, rng: createRng(seed) }
 }
 

@@ -13,7 +13,7 @@ const DIRECTIONS: Record<string, string> = {
   bin2dec: 'Binair → decimaal',
 }
 export const binaryPage: Page = (root) => {
-  const state = readState(PATH)
+  const state = readState(PATH, ['niveau', 'richting'])
   const choice = state.params.get('richting') ?? 'willekeurig'
   const direction: Direction | undefined = choice === 'dec2bin' || choice === 'bin2dec' ? choice : undefined
   const ex = generateBinary(state.rng, state.level, direction)
