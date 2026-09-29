@@ -16,7 +16,7 @@ Elke oefening heeft drie niveaus: **Basis**, **Gevorderd** en **Expert**. Bij om
 Deze regels zitten in de rekenkern (`src/lib/ipv4.ts`) en worden door tests bewaakt:
 - **Bruikbaar** = een adres dat aan een toestel gekoppeld kan worden. Daarom is **/30** de grootste prefix; /31 en /32 komen nooit voor.
 - **Nooit supernetting**: de prefix is nooit korter dan de standaardprefix van de klasse (A /8, B /16, C /24) – zie `isSubnettingAllowed`.
-- Bij n geleende bits zijn er **2ⁿ subnetten**, genummerd vanaf **subnet 0**.
+- Bij n geleende bits zijn er **2ⁿ subnetten**, genummerd vanaf **subnet 1** (het eerste subnet, vroeger ook "subnet zero" genoemd, is bruikbaar).
 - Het gegeven IP-adres of startnetwerk ligt nooit in een speciaal bereik (0.x, 127.x, 169.254.x, 100.64.0.0/10, documentatiebereiken, klasse D/E).
 
 ## Opgave delen

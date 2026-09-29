@@ -226,7 +226,7 @@ describe('geen supernetting (enkel subnetting)', () => {
   })
 })
 
-describe('FLSM-voorbeelden oefening 3 (2^n subnetten, subnet 0 bruikbaar)', () => {
+describe('FLSM-voorbeelden oefening 3 (2^n subnetten, ook het eerste subnet is bruikbaar)', () => {
   it('10.0.0.0/8 in minstens 1000 netwerken → /18', () => {
     const plan = planSubnets(ip('10.0.0.0'), 8, 1000)
     expect(plan.borrowedBits).toBe(10)
@@ -237,7 +237,7 @@ describe('FLSM-voorbeelden oefening 3 (2^n subnetten, subnet 0 bruikbaar)', () =
     expect(formatIp(subnetAt(plan, 1023).broadcast)).toBe('10.255.255.255')
   })
 
-  it('192.168.10.0/24 in minstens 3 netwerken → /26, subnet 3 = .192 – .255', () => {
+  it('192.168.10.0/24 in minstens 3 netwerken → /26, het vierde subnet (index 3) = .192 – .255', () => {
     const plan = planSubnets(ip('192.168.10.0'), 24, 3)
     expect(plan.newPrefix).toBe(26)
     expect(plan.subnetCount).toBe(4)

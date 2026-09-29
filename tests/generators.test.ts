@@ -185,7 +185,7 @@ describe('geen enkele opgave bevat supernetting', () => {
 
 describe('oefening 3: altijd een selectie van 4 subnetten', () => {
   for (const level of LEVELS) {
-    it(`niveau ${level}: 4 subnetten (of alle bij 2 subnetten), altijd subnet 0, 1 en het laatste`, () => {
+    it(`niveau ${level}: 4 subnetten (of alle bij 2 subnetten), altijd het eerste, het tweede en het laatste subnet (intern index 0, 1 en n-1)`, () => {
       const rng = createRng(4000 + level)
       for (let i = 0; i < 2000; i++) {
         const ex = generateSubnet(rng, level)
