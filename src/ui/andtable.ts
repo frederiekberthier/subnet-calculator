@@ -36,13 +36,16 @@ export function andTableHtml(rows: Row[], prefix: number, oldPrefix = prefix): s
   const subBits = prefix - oldPrefix
   return `
     <div class="and-table" role="table" aria-label="Binaire uitwerking">
+      <div class="sr-only" role="row">
+        <span role="columnheader">Adres</span><span role="columnheader">Binair</span><span role="columnheader">Decimaal</span>
+      </div>
       ${rows
         .map(
           (row) => `
-        ${row.ruleAbove ? `<div class="at-rule" role="presentation"><span>${row.ruleAbove}</span></div>` : ''}
+        ${row.ruleAbove ? `<div class="at-rule" role="row"><span role="cell" aria-colspan="3">${row.ruleAbove}</span></div>` : ''}
         <div class="at-row" role="row">
           <span class="at-label" role="rowheader">${row.label}</span>
-          <span class="at-bits mono" role="cell" aria-label="${formatBinary(row.value)}">${bitsHtml(row.value, prefix, oldPrefix)}</span>
+          <span class="at-bits mono" role="cell"><span class="sr-only">${formatBinary(row.value)}</span><span class="at-bits-visual" aria-hidden="true">${bitsHtml(row.value, prefix, oldPrefix)}</span></span>
           <span class="at-dec mono" role="cell">${formatIp(row.value)}</span>
         </div>`,
         )

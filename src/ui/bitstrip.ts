@@ -26,7 +26,7 @@ export function bitStripHtml(value: number, { title, prefix, wrongAnswers = [] }
       return `
         <div class="bs-byte${wrong !== null && wrong !== undefined ? ' bs-wrong' : ''}">
           <div class="bs-row bs-weights" aria-hidden="true">${WEIGHTS.map((w) => `<span>${w}</span>`).join('')}</div>
-          <div class="bs-row bs-bits" aria-label="Byte ${i + 1}: ${bits}">${[...bits].map((bit) => `<span class="${bit === '1' ? 'on' : 'off'}">${bit}</span>`).join('')}</div>
+          <div class="bs-row bs-bits" role="img" aria-label="Byte ${i + 1}: ${bits}">${[...bits].map((bit) => `<span class="${bit === '1' ? 'on' : 'off'}">${bit}</span>`).join('')}</div>
           ${bar}
           <div class="bs-dec">${octet}</div>
           <div class="bs-sum">${terms.length ? terms.join('+') : '0'}</div>

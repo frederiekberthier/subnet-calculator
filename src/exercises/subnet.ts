@@ -136,7 +136,7 @@ export const subnetPage: Page = (root) => {
     const askedSet = new Set(ex.askIndices)
     const all = Array.from({ length: plan.subnetCount }, (_, i) => subnetAt(plan, i))
     const table = `
-      <div class="table-scroll">
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Alle subnetten (scrollbaar)">
         <table class="subnet-table mono">
           <thead><tr><th>Subnet</th><th>Netwerkadres</th><th>Eerste bruikbare</th><th>Laatste bruikbare</th><th>Broadcast</th></tr></thead>
           <tbody>
