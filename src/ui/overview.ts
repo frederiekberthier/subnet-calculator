@@ -12,6 +12,18 @@ export interface Answer {
   result: FieldResult
 }
 
+/**
+ * Eén resultaat voor een heel adres: een formaatfout gaat voor (dan verschijnt de tip), dan fout, dan leeg.
+ * Anders zou een leeg eerste vakje de tip voor bv. "300" in een later vakje verbergen (issue #14).
+ */
+export function summarize(results: FieldResult[]): FieldResult {
+  for (const status of ['format', 'wrong', 'empty'] as const) {
+    const found = results.find((r) => r.status === status)
+    if (found) return found
+  }
+  return results[0]
+}
+
 /** Controleer een adres in 4 vakjes (data-field = name); markeer de vakjes als mark = true. */
 export function addressAnswer(form: HTMLElement, name: string, label: string, value: number, mark: boolean): Answer {
   const expected = toOctets(value)
@@ -23,7 +35,7 @@ export function addressAnswer(form: HTMLElement, name: string, label: string, va
     label,
     correct: formatIp(value),
     given: texts.every((t) => t.trim() === '') ? '' : texts.join('.'),
-    result: results.find((r) => r.status !== 'ok') ?? results[0],
+    result: summarize(results),
   }
 }
 
