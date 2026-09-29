@@ -1,0 +1,3 @@
+# Vitest schrijft snapshots altijd met LF-regeleinden. Zonder deze regel zet Git ze op Windows
+# om naar CRLF, waarna elke testrun het bestand als "gewijzigd" markeert.
+*.snap text eol=lf
