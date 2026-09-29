@@ -3,7 +3,7 @@ import { generateSubnet } from '../lib/generators'
 import { formatIp, interestingOctet, magicNumber, prefixToMask, subnetAt, toOctets, type NetworkInfo } from '../lib/ipv4'
 import type { Page } from '../router'
 import { andTableHtml } from '../ui/andtable'
-import { clearMarks, feedbackHtml, formatCount as fmt, levelSelectHtml, readState, wireToolbar } from '../ui/exercise'
+import { clearMarks, focusAfterNew, formatCount as fmt, levelSelectHtml, outdatedNoticeHtml, readState, showFeedback, showSolution, wireToolbar } from '../ui/exercise'
 import { octetInputsHtml, wireOctetInputs } from '../ui/octets'
 import { addressAnswer, fieldAnswer, overviewHtml, type Answer } from '../ui/overview'
 
@@ -44,6 +44,7 @@ export const subnetPage: Page = (root) => {
       ${levelSelectHtml(state.level)}
       <button type="button" class="btn" data-action="new">Nieuwe oefening</button>
     </div>
+    ${outdatedNoticeHtml(state)}
 
     <div class="panel assignment">
       <div><span class="assignment-label">Netwerk</span><span class="assignment-value mono">${formatIp(ex.network)}</span></div>
@@ -86,7 +87,7 @@ export const subnetPage: Page = (root) => {
       <div class="feedback-area" aria-live="polite"></div>
     </form>
 
-    <section class="panel solution" hidden aria-live="polite"></section>`
+    <section class="panel solution" hidden></section>`
 
   const form = root.querySelector('form')!
   const feedback = root.querySelector<HTMLElement>('.feedback-area')!
@@ -101,7 +102,7 @@ export const subnetPage: Page = (root) => {
       el.value = el.value.replace(/\D/g, '')
     })
   }
-  input('borrowed').focus()
+  focusAfterNew(input('borrowed'))
 
   const evaluate = (mark: boolean): Answer[] => {
     const number = (id: string, label: string, expected: number) =>
@@ -122,10 +123,12 @@ export const subnetPage: Page = (root) => {
   form.addEventListener('submit', (e) => {
     e.preventDefault()
     clearMarks(form)
-    feedback.innerHTML = feedbackHtml(evaluate(true).map((a) => a.result))
+    showFeedback(feedback, form, evaluate(true).map((a) => a.result))
+    // Een zichtbare oplossing mee bijwerken, anders toont ze nog de vorige antwoorden (issue #3).
+    if (!solution.hidden) renderSolution()
   })
 
-  root.querySelector('[data-action="solution"]')!.addEventListener('click', () => {
+  const renderSolution = () => {
     const answers = evaluate(false)
     const n = plan.borrowedBits
     const byte = interestingOctet(plan.newPrefix)
@@ -134,7 +137,7 @@ export const subnetPage: Page = (root) => {
     const askedSet = new Set(ex.askIndices)
     const all = Array.from({ length: plan.subnetCount }, (_, i) => subnetAt(plan, i))
     const table = `
-      <div class="table-scroll">
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Alle subnetten (scrollbaar)">
         <table class="subnet-table mono">
           <thead><tr><th>Subnet</th><th>Netwerkadres</th><th>Eerste bruikbare</th><th>Laatste bruikbare</th><th>Broadcast</th></tr></thead>
           <tbody>
@@ -192,7 +195,10 @@ export const subnetPage: Page = (root) => {
           : table
       }
       <p class="muted small">De gevraagde subnetten zijn gemarkeerd.</p>`
-    solution.hidden = false
-    solution.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  root.querySelector('[data-action="solution"]')!.addEventListener('click', () => {
+    renderSolution()
+    showSolution(solution)
   })
 }

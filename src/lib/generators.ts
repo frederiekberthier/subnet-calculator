@@ -15,6 +15,14 @@ import {
 } from './ipv4'
 import type { Rng } from './random'
 
+/**
+ * Versie van de opgavegenerators. Staat als &v=... in elke link, zodat een gedeelde link die met een
+ * oudere versie gemaakt is een melding toont (dezelfde seed kan dan een andere opgave geven, issue #22).
+ * Verhoog dit getal bij ELKE wijziging die de opgave voor een seed verandert; de snapshot-test in
+ * tests/generators.test.ts faalt tot dan.
+ */
+export const GENERATOR_VERSION = 2
+
 /** 1 = classful (/8, /16, /24), 2 = grens in het laatste octet (/24-/30), 3 = willekeurige prefix. */
 export type Level = 1 | 2 | 3
 
@@ -64,7 +72,7 @@ function firstOctetFor(rng: Rng, cls: 'A' | 'B' | 'C'): number {
 }
 
 /** Speciale bereiken die geen goed voorbeeld zijn van "publiek" of "privaat". */
-function isSpecial(ip: number): boolean {
+export function isSpecial(ip: number): boolean {
   const [a, b] = [ip >>> 24, (ip >>> 16) & 255]
   return (
     a === 0 ||
@@ -128,7 +136,14 @@ export function generateAnalyze(rng: Rng, level: Level): AnalyzeExercise {
   const prefix = prefixFor(rng, level, base)
   const network = networkAddress(base, prefix)
   // Af en toe het netwerkadres zelf geven, anders een bruikbaar hostadres (nooit de broadcast).
-  const ip = rng.chance(0.2) ? network : network + rng.int(1, 2 ** (32 - prefix) - 2)
+  // Bij grote netwerken (bv. /8) kan het hostadres in een speciaal bereik vallen (100.64.0.0/10 ...):
+  // opnieuw trekken, want publiek/privaat is daar niet eenduidig.
+  let ip = network
+  if (!rng.chance(0.2)) {
+    do {
+      ip = network + rng.int(1, 2 ** (32 - prefix) - 2)
+    } while (isSpecial(ip))
+  }
   return {
     ip,
     prefix,
@@ -155,10 +170,12 @@ function chooseIndices(rng: Rng, count: number): number[] {
 
 export function generateSubnet(rng: Rng, level: Level): SubnetExercise {
   const settings = SUBNET_SETTINGS[level]
-  const prefix = rng.pick(settings.prefixes)
-  // Enkel klassen waarvoor deze prefix geen supernetting is (zie isSubnettingAllowed); planSubnets controleert dit nog eens.
-  const classes = level === 1 ? (['C'] as const) : (['A', 'B', 'C'] as const).filter((c) => defaultPrefix(c)! <= prefix)
-  const network = networkAddress(randomAddress(rng, rng.pick(classes)), prefix)
+  // Eerst de klasse (gelijk verdeeld), dan een prefix die voor die klasse geen supernetting is
+  // (zie isSubnettingAllowed; planSubnets controleert dit nog eens). Andersom kwam klasse C op
+  // niveau Expert maar in ±5% van de opgaves voor (issue #20).
+  const cls = level === 1 ? 'C' : rng.pick(['A', 'B', 'C'] as const)
+  const prefix = rng.pick(settings.prefixes.filter((p) => p >= defaultPrefix(cls)!))
+  const network = networkAddress(randomAddress(rng, cls), prefix)
   const maxBits = Math.min(MAX_USABLE_PREFIX - prefix, Math.log2(settings.maxRequested))
   // Meestal geen macht van 2, zodat de student moet afronden naar boven.
   const requested = rng.chance(0.3) ? 2 ** rng.int(1, maxBits) : rng.int(3, 2 ** maxBits - 1)

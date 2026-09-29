@@ -1,0 +1,21 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`vaste opgaves per seed > generatorversie 2 1`] = `
+[
+  "n1 s1: bin 2887318519/16 dec2bin | ana 2887294178/16 dotted | sub 3232270080/24 x4 [0,1,2,3] dotted",
+  "n1 s2: bin 3232254345/24 bin2dec | ana 3232254369/24 dotted | sub 3232254208/24 x6 [0,1,4,7] dotted",
+  "n1 s3: bin 3232265235/24 bin2dec | ana 3232265339/24 dotted | sub 3232265216/24 x5 [0,1,4,7] dotted",
+  "n1 s4: bin 3232249876/24 dec2bin | ana 3232249986/24 dotted | sub 3232249856/24 x4 [0,1,2,3] dotted",
+  "n1 s5: bin 3349091735/24 bin2dec | ana 3349091701/24 dotted | sub 3349091584/24 x5 [0,1,6,7] dotted",
+  "n2 s1: bin 2887318519/25 bin2dec | ana 2887318491/25 dotted | sub 3203858432/16 x15 [0,1,14,15] dotted",
+  "n2 s2: bin 3232254345/30 bin2dec | ana 3232254345/30 dotted | sub 3232270592/24 x17 [0,1,12,31] cidr",
+  "n2 s3: bin 3232265235/29 dec2bin | ana 3232265235/29 dotted | sub 3232240384/24 x17 [0,1,6,31] dotted",
+  "n2 s4: bin 3232249876/25 bin2dec | ana 3232249866/25 cidr | sub 3232240640/24 x5 [0,1,6,7] cidr",
+  "n2 s5: bin 3349091735/29 dec2bin | ana 3349091734/29 dotted | sub 3232276224/24 x23 [0,1,15,31] cidr",
+  "n3 s1: bin 2887318519/20 bin2dec | ana 2887318407/20 dotted | sub 3203858432/16 x28 [0,1,30,31] dotted",
+  "n3 s2: bin 3232254345/30 bin2dec | ana 3232254345/30 dotted | sub 3232270592/24 x33 [0,1,23,63] cidr",
+  "n3 s3: bin 3232265235/29 dec2bin | ana 3232265235/29 dotted | sub 3232240384/24 x32 [0,1,6,31] dotted",
+  "n3 s4: bin 3232249876/25 bin2dec | ana 3232249866/25 cidr | sub 3232240640/24 x7 [0,1,6,7] cidr",
+  "n3 s5: bin 3349091735/29 dec2bin | ana 3349091734/29 dotted | sub 3232276224/26 x12 [0,1,7,15] cidr",
+]
+`;

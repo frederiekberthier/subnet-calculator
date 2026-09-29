@@ -11,17 +11,13 @@ import {
   interestingOctet,
   isPrivate,
   isSubnettingAllowed,
-  isValidMask,
   lastHost,
   magicNumber,
   maskToPrefix,
   minPrefix,
   networkAddress,
   networkInfo,
-  parseBinaryIp,
-  parseBinaryOctet,
   parseIp,
-  parseMask,
   planSubnets,
   prefixToMask,
   subnetAt,
@@ -61,15 +57,6 @@ describe('binaire omzetting', () => {
     expect(toBinaryOctets(ip('192.168.1.10'))).toEqual(['11000000', '10101000', '00000001', '00001010'])
     expect(formatBinary(ip('255.255.240.0'))).toBe('11111111.11111111.11110000.00000000')
   })
-
-  it('parset binaire octetten en adressen', () => {
-    expect(parseBinaryOctet('10101000')).toBe(168)
-    expect(parseBinaryOctet('0')).toBe(0)
-    expect(parseBinaryOctet('101010001')).toBeNull()
-    expect(parseBinaryOctet('10201')).toBeNull()
-    expect(parseBinaryIp('11000000.10101000.00000001.00001010')).toBe(ip('192.168.1.10'))
-    expect(parseBinaryIp('11000000.10101000.00000001')).toBeNull()
-  })
 })
 
 describe('subnetmaskers', () => {
@@ -88,18 +75,10 @@ describe('subnetmaskers', () => {
   })
 
   it('herkent ongeldige maskers', () => {
-    expect(isValidMask(ip('255.255.255.0'))).toBe(true)
-    expect(isValidMask(ip('255.0.255.0'))).toBe(false)
-    expect(isValidMask(ip('255.255.255.1'))).toBe(false)
+    expect(maskToPrefix(ip('255.255.255.0'))).toBe(24)
+    expect(maskToPrefix(ip('255.0.255.0'))).toBeNull()
+    expect(maskToPrefix(ip('255.255.255.1'))).toBeNull()
     expect(maskToPrefix(ip('0.255.255.255'))).toBeNull()
-  })
-
-  it('parseMask aanvaardt dotted decimal en CIDR', () => {
-    expect(parseMask('255.255.255.0')).toBe(24)
-    expect(parseMask('/26')).toBe(26)
-    expect(parseMask('19')).toBe(19)
-    expect(parseMask('/33')).toBeNull()
-    expect(parseMask('255.0.255.0')).toBeNull()
   })
 })
 

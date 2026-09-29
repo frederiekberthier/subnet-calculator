@@ -3,7 +3,7 @@ import { generateBinary, type Direction } from '../lib/generators'
 import { formatBinary, formatIp, prefixToMask, toOctets } from '../lib/ipv4'
 import type { Page } from '../router'
 import { bitStripHtml } from '../ui/bitstrip'
-import { clearMarks, feedbackHtml, levelSelectHtml, markField, readState, wireToolbar } from '../ui/exercise'
+import { clearMarks, focusAfterNew, levelSelectHtml, outdatedNoticeHtml, markField, readState, showFeedback, showSolution, wireToolbar } from '../ui/exercise'
 import { octetInputs, octetInputsHtml, octetValues, wireOctetInputs } from '../ui/octets'
 
 const PATH = '/omrekenen'
@@ -13,7 +13,7 @@ const DIRECTIONS: Record<string, string> = {
   bin2dec: 'Binair → decimaal',
 }
 export const binaryPage: Page = (root) => {
-  const state = readState(PATH)
+  const state = readState(PATH, ['niveau', 'richting'])
   const choice = state.params.get('richting') ?? 'willekeurig'
   const direction: Direction | undefined = choice === 'dec2bin' || choice === 'bin2dec' ? choice : undefined
   const ex = generateBinary(state.rng, state.level, direction)
@@ -46,6 +46,7 @@ export const binaryPage: Page = (root) => {
       </label>
       <button type="button" class="btn" data-action="new">Nieuwe oefening</button>
     </div>
+    ${outdatedNoticeHtml(state)}
 
     <form class="panel exercise" novalidate>
       <div class="qa">
@@ -69,7 +70,7 @@ export const binaryPage: Page = (root) => {
       <div class="feedback-area" aria-live="polite"></div>
     </form>
 
-    <section class="panel solution" hidden aria-live="polite"></section>`
+    <section class="panel solution" hidden></section>`
 
   const form = root.querySelector('form')!
   const feedback = root.querySelector<HTMLElement>('.feedback-area')!
@@ -80,7 +81,7 @@ export const binaryPage: Page = (root) => {
   prefixInput.addEventListener('input', () => {
     prefixInput.value = prefixInput.value.replace(/\D/g, '')
   })
-  octetInputs(form, 'ip')[0].focus()
+  focusAfterNew(octetInputs(form, 'ip')[0])
 
   const checkOctet = toBinary ? checkBinaryOctet : checkDecimalOctet
   const fields = [
@@ -112,17 +113,22 @@ export const binaryPage: Page = (root) => {
     const r = checkPrefix(prefixInput.value, ex.prefix)
     markField(prefixInput, r)
     results.push(r)
-    feedback.innerHTML = feedbackHtml(results)
+    showFeedback(feedback, form, results)
+    // Een zichtbare oplossing mee bijwerken, anders toont ze nog de vorige antwoorden (issue #3).
+    if (!solution.hidden) renderSolution()
   })
 
   // De oplossing wordt pas bij het klikken opgebouwd, zodat foute bytes van de student gemarkeerd worden.
-  root.querySelector('[data-action="solution"]')!.addEventListener('click', () => {
+  const renderSolution = () => {
     solution.innerHTML = `
       <h2>Oplossing</h2>
       ${bitStripHtml(ex.ip, { title: `IP-adres ${formatIp(ex.ip)}`, wrongAnswers: wrongAnswers('ip', ex.ip) })}
       ${bitStripHtml(mask, { title: `Subnetmasker ${formatIp(mask)}`, prefix: ex.prefix, wrongAnswers: wrongAnswers('mask', mask) })}
       <p>Het subnetmasker bevat <strong>${ex.prefix}</strong> enen op rij, dus de prefix is <strong>/${ex.prefix}</strong>.</p>`
-    solution.hidden = false
-    solution.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  root.querySelector('[data-action="solution"]')!.addEventListener('click', () => {
+    renderSolution()
+    showSolution(solution)
   })
 }

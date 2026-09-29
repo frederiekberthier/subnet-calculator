@@ -4,7 +4,7 @@ import { formatIp, prefixToMask, toOctets } from '../lib/ipv4'
 import type { Page } from '../router'
 import { andTableHtml } from '../ui/andtable'
 import { choiceGroup, choiceHtml, choiceValue } from '../ui/choice'
-import { clearMarks, feedbackHtml, formatCount, levelSelectHtml, readState, wireToolbar } from '../ui/exercise'
+import { clearMarks, focusAfterNew, formatCount, levelSelectHtml, outdatedNoticeHtml, readState, showFeedback, showSolution, wireToolbar } from '../ui/exercise'
 import { octetInputs, octetInputsHtml, wireOctetInputs } from '../ui/octets'
 import { addressAnswer, fieldAnswer, overviewHtml, type Answer } from '../ui/overview'
 
@@ -45,6 +45,7 @@ export const analyzePage: Page = (root) => {
       ${levelSelectHtml(state.level)}
       <button type="button" class="btn" data-action="new">Nieuwe oefening</button>
     </div>
+    ${outdatedNoticeHtml(state)}
 
     <div class="panel assignment">
       <div><span class="assignment-label">IP-adres</span><span class="assignment-value mono">${formatIp(ex.ip)}</span></div>
@@ -83,7 +84,7 @@ export const analyzePage: Page = (root) => {
       <div class="feedback-area" aria-live="polite"></div>
     </form>
 
-    <section class="panel solution" hidden aria-live="polite"></section>`
+    <section class="panel solution" hidden></section>`
 
   const form = root.querySelector('form')!
   const feedback = root.querySelector<HTMLElement>('.feedback-area')!
@@ -97,7 +98,7 @@ export const analyzePage: Page = (root) => {
       input.value = input.value.replace(/\D/g, '')
     })
   }
-  ;(prefixInput ?? octetInputs(form, 'mask')[0]).focus()
+  focusAfterNew(prefixInput ?? octetInputs(form, 'mask')[0])
 
   /** Controleer alle velden, markeer ze en geef een overzicht per antwoord terug. */
   const evaluate = (mark: boolean): Answer[] => {
@@ -121,10 +122,12 @@ export const analyzePage: Page = (root) => {
   form.addEventListener('submit', (e) => {
     e.preventDefault()
     clearMarks(form)
-    feedback.innerHTML = feedbackHtml(evaluate(true).map((a) => a.result))
+    showFeedback(feedback, form, evaluate(true).map((a) => a.result))
+    // Een zichtbare oplossing mee bijwerken, anders toont ze nog de vorige antwoorden (issue #3).
+    if (!solution.hidden) renderSolution()
   })
 
-  root.querySelector('[data-action="solution"]')!.addEventListener('click', () => {
+  const renderSolution = () => {
     const answers = evaluate(false)
     const hostBits = 32 - ex.prefix
     const first = toOctets(ex.ip)[0]
@@ -160,7 +163,10 @@ export const analyzePage: Page = (root) => {
             : 'het adres ligt niet in een van de privébereiken, dus het is publiek.'
         } Privébereiken: 10.0.0.0/8, 172.16.0.0/12 en 192.168.0.0/16.</li>
       </ol>`
-    solution.hidden = false
-    solution.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  root.querySelector('[data-action="solution"]')!.addEventListener('click', () => {
+    renderSolution()
+    showSolution(solution)
   })
 }

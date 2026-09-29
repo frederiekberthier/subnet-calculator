@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { generateAnalyze, generateBinary, generateSubnet, LEVELS, randomAddress } from '../src/lib/generators'
+import {
+  GENERATOR_VERSION,
+  generateAnalyze,
+  generateBinary,
+  generateSubnet,
+  isSpecial,
+  LEVELS,
+  randomAddress,
+} from '../src/lib/generators'
 import {
   broadcastAddress,
   defaultPrefix,
@@ -189,4 +197,50 @@ describe('oefening 3: altijd een selectie van 4 subnetten', () => {
       }
     })
   }
+})
+
+describe('adresanalyse: nooit een speciaal adres (issue #12)', () => {
+  for (const level of LEVELS) {
+    it(`niveau ${level}: het gevraagde IP-adres zelf ligt nooit in een speciaal bereik`, () => {
+      const rng = createRng(1200 + level)
+      for (let i = 0; i < 20000; i++) {
+        const ex = generateAnalyze(rng, level)
+        expect(isSpecial(ex.ip), `${ex.ip}/${ex.prefix}`).toBe(false)
+      }
+    })
+  }
+})
+
+describe('oefening 3: klassen gelijk verdeeld (issue #20)', () => {
+  for (const level of [2, 3] as const) {
+    it(`niveau ${level}: klasse A, B en C elk ongeveer een derde`, () => {
+      const rng = createRng(2000 + level)
+      const count: Record<string, number> = { A: 0, B: 0, C: 0 }
+      const N = 6000
+      for (let i = 0; i < N; i++) count[getClass(generateSubnet(rng, level).network)]++
+      for (const cls of ['A', 'B', 'C']) {
+        expect(count[cls] / N, `klasse ${cls}`).toBeGreaterThan(0.28)
+        expect(count[cls] / N, `klasse ${cls}`).toBeLessThan(0.39)
+      }
+    })
+  }
+})
+
+// Faalt deze test? Dan geeft dezelfde seed een andere opgave, en tonen al gedeelde links iets anders.
+// Verhoog dan GENERATOR_VERSION in src/lib/generators.ts en werk de snapshot bij met `npx vitest -u` (issue #22).
+describe('vaste opgaves per seed', () => {
+  it(`generatorversie ${GENERATOR_VERSION}`, () => {
+    const out: string[] = []
+    for (const level of LEVELS) {
+      for (let seed = 1; seed <= 5; seed++) {
+        const b = generateBinary(createRng(seed), level)
+        const a = generateAnalyze(createRng(seed), level)
+        const s = generateSubnet(createRng(seed), level)
+        out.push(
+          `n${level} s${seed}: bin ${b.ip}/${b.prefix} ${b.direction} | ana ${a.ip}/${a.prefix} ${a.maskNotation} | sub ${s.network}/${s.prefix} x${s.requested} [${s.askIndices}] ${s.maskNotation}`,
+        )
+      }
+    }
+    expect(out).toMatchSnapshot()
+  })
 })
