@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { generateAnalyze, generateBinary, generateSubnet, LEVELS, randomAddress } from '../src/lib/generators'
+import { generateAnalyze, generateBinary, generateSubnet, isSpecial, LEVELS, randomAddress } from '../src/lib/generators'
 import {
   broadcastAddress,
   defaultPrefix,
@@ -186,6 +186,18 @@ describe('oefening 3: altijd een selectie van 4 subnetten', () => {
         expect(ex.askIndices).toContain(0)
         expect(ex.askIndices).toContain(1)
         expect(ex.askIndices).toContain(ex.plan.subnetCount - 1)
+      }
+    })
+  }
+})
+
+describe('adresanalyse: nooit een speciaal adres (issue #12)', () => {
+  for (const level of LEVELS) {
+    it(`niveau ${level}: het gevraagde IP-adres zelf ligt nooit in een speciaal bereik`, () => {
+      const rng = createRng(1200 + level)
+      for (let i = 0; i < 20000; i++) {
+        const ex = generateAnalyze(rng, level)
+        expect(isSpecial(ex.ip), `${ex.ip}/${ex.prefix}`).toBe(false)
       }
     })
   }

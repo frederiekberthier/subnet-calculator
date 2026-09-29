@@ -64,7 +64,7 @@ function firstOctetFor(rng: Rng, cls: 'A' | 'B' | 'C'): number {
 }
 
 /** Speciale bereiken die geen goed voorbeeld zijn van "publiek" of "privaat". */
-function isSpecial(ip: number): boolean {
+export function isSpecial(ip: number): boolean {
   const [a, b] = [ip >>> 24, (ip >>> 16) & 255]
   return (
     a === 0 ||
@@ -128,7 +128,14 @@ export function generateAnalyze(rng: Rng, level: Level): AnalyzeExercise {
   const prefix = prefixFor(rng, level, base)
   const network = networkAddress(base, prefix)
   // Af en toe het netwerkadres zelf geven, anders een bruikbaar hostadres (nooit de broadcast).
-  const ip = rng.chance(0.2) ? network : network + rng.int(1, 2 ** (32 - prefix) - 2)
+  // Bij grote netwerken (bv. /8) kan het hostadres in een speciaal bereik vallen (100.64.0.0/10 ...):
+  // opnieuw trekken, want publiek/privaat is daar niet eenduidig.
+  let ip = network
+  if (!rng.chance(0.2)) {
+    do {
+      ip = network + rng.int(1, 2 ** (32 - prefix) - 2)
+    } while (isSpecial(ip))
+  }
   return {
     ip,
     prefix,
