@@ -55,7 +55,7 @@ export interface SubnetExercise {
   prefix: number
   requested: number
   plan: SubnetPlan
-  /** Indexen (subnet 0, 1, ...) van de subnetten die de student volledig moet uitschrijven. */
+  /** Indexen (vanaf 0) van de subnetten die de student volledig moet uitschrijven; de student ziet ze als subnet 1, 2, ... */
   askIndices: number[]
   /** Toon het huidige masker als 255.255.0.0 (dotted) of als /16 (cidr). */
   maskNotation: 'dotted' | 'cidr'

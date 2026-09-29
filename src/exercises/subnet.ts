@@ -10,6 +10,12 @@ import { addressAnswer, fieldAnswer, overviewHtml, type Answer } from '../ui/ove
 const PATH = '/subnetten'
 const BYTE_NAMES = ['1e', '2e', '3e', '4e']
 
+/**
+ * Naam van een subnet zoals de student ze ziet. Intern tellen we vanaf 0 (subnet i begint op
+ * netwerk + i × blokgrootte), maar in de opleiding heet het eerste subnet "subnet 1".
+ */
+const subnetName = (index: number) => `Subnet ${index + 1}`
+
 /** De vier adressen die per gevraagd subnet ingevuld worden. */
 const SUBNET_FIELDS: ReadonlyArray<[key: keyof NetworkInfo, label: string]> = [
   ['network', 'Netwerkadres'],
@@ -37,7 +43,7 @@ export const subnetPage: Page = (root) => {
     <p class="lead">
       Verdeel het netwerk in minstens het gevraagde aantal even grote subnetten. Bereken hoeveel bits je leent,
       het nieuwe subnetmasker en hoeveel subnetten en bruikbare hostadressen je krijgt. Schrijf daarna de
-      gevraagde subnetten volledig uit. De subnetten zijn genummerd vanaf <strong>subnet 0</strong>.
+      gevraagde subnetten volledig uit. De subnetten zijn genummerd vanaf <strong>subnet 1</strong>.
     </p>
 
     <div class="toolbar">
@@ -71,9 +77,9 @@ export const subnetPage: Page = (root) => {
           .map(
             ({ index }) => `
           <fieldset class="subnet-card">
-            <legend>Subnet ${index}</legend>
+            <legend>${subnetName(index)}</legend>
             <div class="qa qa-2">
-              ${SUBNET_FIELDS.map(([key, label]) => `<div class="qa-label">${label}</div>${octetInputsHtml(`s${index}-${key}`, 'dec', `Subnet ${index}, ${label}`)}`).join('')}
+              ${SUBNET_FIELDS.map(([key, label]) => `<div class="qa-label">${label}</div>${octetInputsHtml(`s${index}-${key}`, 'dec', `${subnetName(index)}, ${label}`)}`).join('')}
             </div>
           </fieldset>`,
           )
@@ -115,7 +121,7 @@ export const subnetPage: Page = (root) => {
       number('subnets', 'Aantal subnetten', plan.subnetCount),
       number('hosts', 'Bruikbare hostadressen per subnet', plan.hostsPerSubnet),
       ...asked.flatMap(({ index, info }) =>
-        SUBNET_FIELDS.map(([key, label]) => addressAnswer(form, `s${index}-${key}`, `Subnet ${index} – ${label.toLowerCase()}`, info[key], mark)),
+        SUBNET_FIELDS.map(([key, label]) => addressAnswer(form, `s${index}-${key}`, `${subnetName(index)} – ${label.toLowerCase()}`, info[key], mark)),
       ),
     ]
   }
@@ -145,7 +151,7 @@ export const subnetPage: Page = (root) => {
               .map(
                 (s, i) => `
               <tr class="${askedSet.has(i) ? 'asked' : ''}">
-                <th scope="row">${i}</th>
+                <th scope="row">${i + 1}</th>
                 <td>${formatIp(s.network)}</td><td>${formatIp(s.firstHost)}</td><td>${formatIp(s.lastHost)}</td><td>${formatIp(s.broadcast)}</td>
               </tr>`,
               )
@@ -166,7 +172,7 @@ export const subnetPage: Page = (root) => {
           ${n > 1 ? `2<sup>${n - 1}</sup> = ${2 ** (n - 1)} is te weinig, ` : ''}2<sup>${n}</sup> = ${2 ** n} is genoeg → <strong>${n} bit${n === 1 ? '' : 's'}</strong>.</li>
         <li><strong>Nieuwe prefix</strong> = /${ex.prefix} + ${n} = <strong>/${plan.newPrefix}</strong>
           → nieuw subnetmasker <span class="mono">${formatIp(newMask)}</span>.</li>
-        <li><strong>Aantal subnetten</strong> = 2<sup>${n}</sup> = <strong>${fmt(plan.subnetCount)}</strong> (subnet 0 tot en met subnet ${last}).</li>
+        <li><strong>Aantal subnetten</strong> = 2<sup>${n}</sup> = <strong>${fmt(plan.subnetCount)}</strong> (subnet 1 tot en met subnet ${last + 1}).</li>
         <li><strong>Bruikbare hostadressen per subnet:</strong> er blijven ${hostBits} hostbits over →
           2<sup>${hostBits}</sup> − 2 = ${fmt(2 ** hostBits)} − 2 = <strong>${fmt(plan.hostsPerSubnet)}</strong>.</li>
         <li><strong>Blokgrootte:</strong> in de ${BYTE_NAMES[byte]} byte is het nieuwe masker ${toOctets(newMask)[byte]},
@@ -180,9 +186,9 @@ export const subnetPage: Page = (root) => {
         [
           { label: 'Oud masker', value: oldMask },
           { label: 'Nieuw masker', value: newMask },
-          { label: 'Subnet 0', value: all[0].network, ruleAbove: 'subnetten' },
-          ...(plan.subnetCount > 2 ? [{ label: 'Subnet 1', value: all[1].network }] : []),
-          { label: `Subnet ${last}`, value: all[last].network },
+          { label: subnetName(0), value: all[0].network, ruleAbove: 'subnetten' },
+          ...(plan.subnetCount > 2 ? [{ label: subnetName(1), value: all[1].network }] : []),
+          { label: subnetName(last), value: all[last].network },
         ],
         plan.newPrefix,
         ex.prefix,
