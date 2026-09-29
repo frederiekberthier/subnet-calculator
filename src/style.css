@@ -100,6 +100,28 @@ h1 {
   margin: 0 0 0.5rem;
 }
 
+/* ---------- Naar inhoud (enkel zichtbaar bij toetsenbordfocus) ---------- */
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -3rem;
+  z-index: 10;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  background: var(--brand);
+  color: #1c1d1e;
+  font-weight: 700;
+}
+
+.skip-link:focus {
+  top: 0.5rem;
+}
+
+main:focus {
+  outline: none;
+}
+
 /* ---------- Header ---------- */
 
 .site-header {
@@ -1073,7 +1095,10 @@ input.is-empty {
   margin: 0 auto;
 }
 
-.site-footer h3 {
+.footer-title {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  line-height: 1.2;
   margin: 0 0 0.25rem;
   font-size: 1rem;
   color: var(--bar-text);
@@ -1298,5 +1323,20 @@ input.is-empty {
   .bs-byte:not(:last-child) .bs-bits::after,
   .bs-byte:not(:last-child) .bs-dec::after {
     display: none;
+  }
+}
+
+/* Verminderde beweging (issue #18): geen animaties of verschuivingen. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  .card:hover {
+    transform: none;
   }
 }

@@ -4,7 +4,7 @@ import { formatIp, prefixToMask, toOctets } from '../lib/ipv4'
 import type { Page } from '../router'
 import { andTableHtml } from '../ui/andtable'
 import { choiceGroup, choiceHtml, choiceValue } from '../ui/choice'
-import { clearMarks, formatCount, levelSelectHtml, readState, showFeedback, showSolution, wireToolbar } from '../ui/exercise'
+import { clearMarks, focusAfterNew, formatCount, levelSelectHtml, readState, showFeedback, showSolution, wireToolbar } from '../ui/exercise'
 import { octetInputs, octetInputsHtml, wireOctetInputs } from '../ui/octets'
 import { addressAnswer, fieldAnswer, overviewHtml, type Answer } from '../ui/overview'
 
@@ -83,7 +83,7 @@ export const analyzePage: Page = (root) => {
       <div class="feedback-area" aria-live="polite"></div>
     </form>
 
-    <section class="panel solution" hidden aria-live="polite"></section>`
+    <section class="panel solution" hidden></section>`
 
   const form = root.querySelector('form')!
   const feedback = root.querySelector<HTMLElement>('.feedback-area')!
@@ -97,7 +97,7 @@ export const analyzePage: Page = (root) => {
       input.value = input.value.replace(/\D/g, '')
     })
   }
-  ;(prefixInput ?? octetInputs(form, 'mask')[0]).focus()
+  focusAfterNew(prefixInput ?? octetInputs(form, 'mask')[0])
 
   /** Controleer alle velden, markeer ze en geef een overzicht per antwoord terug. */
   const evaluate = (mark: boolean): Answer[] => {

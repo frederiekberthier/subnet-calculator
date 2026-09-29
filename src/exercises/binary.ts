@@ -3,7 +3,7 @@ import { generateBinary, type Direction } from '../lib/generators'
 import { formatBinary, formatIp, prefixToMask, toOctets } from '../lib/ipv4'
 import type { Page } from '../router'
 import { bitStripHtml } from '../ui/bitstrip'
-import { clearMarks, levelSelectHtml, markField, readState, showFeedback, showSolution, wireToolbar } from '../ui/exercise'
+import { clearMarks, focusAfterNew, levelSelectHtml, markField, readState, showFeedback, showSolution, wireToolbar } from '../ui/exercise'
 import { octetInputs, octetInputsHtml, octetValues, wireOctetInputs } from '../ui/octets'
 
 const PATH = '/omrekenen'
@@ -69,7 +69,7 @@ export const binaryPage: Page = (root) => {
       <div class="feedback-area" aria-live="polite"></div>
     </form>
 
-    <section class="panel solution" hidden aria-live="polite"></section>`
+    <section class="panel solution" hidden></section>`
 
   const form = root.querySelector('form')!
   const feedback = root.querySelector<HTMLElement>('.feedback-area')!
@@ -80,7 +80,7 @@ export const binaryPage: Page = (root) => {
   prefixInput.addEventListener('input', () => {
     prefixInput.value = prefixInput.value.replace(/\D/g, '')
   })
-  octetInputs(form, 'ip')[0].focus()
+  focusAfterNew(octetInputs(form, 'ip')[0])
 
   const checkOctet = toBinary ? checkBinaryOctet : checkDecimalOctet
   const fields = [

@@ -61,8 +61,22 @@ export function readState(path: string, settings: readonly string[] = ['niveau']
   return { path, params, seed, level, rng: createRng(seed) }
 }
 
+/** Staat de focus na de volgende render op het eerste invoervak? Enkel na "Nieuwe oefening" of een instelling. */
+let focusFirstInput = false
+
+/**
+ * Focus op het eerste invoervak, maar enkel na "Nieuwe oefening" of een gewijzigde instelling.
+ * Bij het openen van een pagina blijft de focus bij de titel: op gsm springt anders het klavier open
+ * en verdwijnt de opgave uit beeld, en een schermlezer zou titel en uitleg overslaan (issue #15).
+ */
+export function focusAfterNew(input: HTMLElement): void {
+  if (focusFirstInput) input.focus()
+  focusFirstInput = false
+}
+
 /** Naar een nieuwe opgave met (eventueel) gewijzigde instellingen. */
 export function goToNew(state: ExerciseState, changes: Record<string, string> = {}): void {
+  focusFirstInput = true
   const params = new URLSearchParams(state.params)
   for (const [k, v] of Object.entries(changes)) params.set(k, v)
   params.set('seed', String(randomSeed()))
@@ -137,8 +151,20 @@ export function formatCount(n: number): string {
   return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f')
 }
 
-/** Toon de (net opgebouwde) oplossing en scroll ernaartoe. */
+export function prefersReducedMotion(): boolean {
+  return matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+/**
+ * Toon de (net opgebouwde) oplossing: focus op de kop "Oplossing" (een schermlezer leest dan niet de
+ * hele oplossing ineens voor, issue #16) en scroll ernaartoe, zonder animatie bij verminderde beweging (issue #18).
+ */
 export function showSolution(solution: HTMLElement): void {
   solution.hidden = false
-  solution.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  const heading = solution.querySelector<HTMLElement>('h2')
+  if (heading) {
+    heading.tabIndex = -1
+    heading.focus({ preventScroll: true })
+  }
+  solution.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' })
 }
