@@ -18,9 +18,11 @@ export function octetInputsHtml(name: string, kind: OctetKind, label: string): s
 /** Invoer filteren en naar het volgende vakje springen wanneer een byte vol is of bij een punt. */
 export function wireOctetInputs(root: HTMLElement): void {
   const inputs = [...root.querySelectorAll<HTMLInputElement>('input.octet')]
+  // Na de laatste byte van een adres: naar het volgende invoerveld in het formulier (bv. de prefix).
+  const fields = [...root.querySelectorAll<HTMLInputElement>('input:not([type="radio"])')]
   inputs.forEach((input, i) => {
     const binary = input.closest('.octets-bin') !== null
-    const next = inputs[i + 1]
+    const next = fields[fields.indexOf(input) + 1]
     input.addEventListener('keydown', (e) => {
       if ((e.key === '.' || e.key === ' ') && !binary) {
         e.preventDefault()

@@ -47,8 +47,10 @@ export interface SubnetExercise {
   prefix: number
   requested: number
   plan: SubnetPlan
-  /** Indexen (0-gebaseerd) van de subnetten die de student volledig moet uitschrijven. */
+  /** Indexen (subnet 0, 1, ...) van de subnetten die de student volledig moet uitschrijven. */
   askIndices: number[]
+  /** Toon het huidige masker als 255.255.0.0 (dotted) of als /16 (cidr). */
+  maskNotation: 'dotted' | 'cidr'
 }
 
 // ---------------------------------------------------------------------------
@@ -161,5 +163,7 @@ export function generateSubnet(rng: Rng, level: Level): SubnetExercise {
   // Meestal geen macht van 2, zodat de student moet afronden naar boven.
   const requested = rng.chance(0.3) ? 2 ** rng.int(1, maxBits) : rng.int(3, 2 ** maxBits - 1)
   const plan = planSubnets(network, prefix, requested)
-  return { network, prefix, requested, plan, askIndices: chooseIndices(rng, plan.subnetCount) }
+  const askIndices = chooseIndices(rng, plan.subnetCount)
+  const maskNotation = level === 1 || rng.chance(0.5) ? 'dotted' : 'cidr'
+  return { network, prefix, requested, plan, askIndices, maskNotation }
 }

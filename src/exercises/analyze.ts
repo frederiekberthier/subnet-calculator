@@ -1,11 +1,12 @@
-import { checkChoice, checkDecimalOctet, checkInteger, checkPrefix, type FieldResult } from '../lib/check'
+import { checkChoice, checkInteger, checkPrefix } from '../lib/check'
 import { generateAnalyze } from '../lib/generators'
 import { formatIp, prefixToMask, toOctets } from '../lib/ipv4'
 import type { Page } from '../router'
 import { andTableHtml } from '../ui/andtable'
 import { choiceGroup, choiceHtml, choiceValue } from '../ui/choice'
-import { clearMarks, feedbackHtml, levelSelectHtml, markField, readState, wireToolbar } from '../ui/exercise'
-import { octetInputs, octetInputsHtml, octetValues, wireOctetInputs } from '../ui/octets'
+import { clearMarks, feedbackHtml, formatCount, levelSelectHtml, readState, wireToolbar } from '../ui/exercise'
+import { octetInputs, octetInputsHtml, wireOctetInputs } from '../ui/octets'
+import { addressAnswer, fieldAnswer, overviewHtml, type Answer } from '../ui/overview'
 
 const PATH = '/analyse'
 const CLASSES = ['A', 'B', 'C', 'D', 'E'] as const
@@ -17,14 +18,6 @@ const CLASS_RANGES: Record<string, string> = {
   C: '192 en 223',
   D: '224 en 239',
   E: '240 en 255',
-}
-
-/** Eén rij in het overzicht: wat is juist en wat vulde de student in. */
-interface Answer {
-  label: string
-  correct: string
-  given: string
-  result: FieldResult
 }
 
 export const analyzePage: Page = (root) => {
@@ -108,36 +101,21 @@ export const analyzePage: Page = (root) => {
 
   /** Controleer alle velden, markeer ze en geef een overzicht per antwoord terug. */
   const evaluate = (mark: boolean): Answer[] => {
-    const answers: Answer[] = []
-    const address = (name: string, label: string, value: number) => {
-      const expected = toOctets(value)
-      const texts = octetValues(form, name)
-      const inputs = octetInputs(form, name)
-      const results = texts.map((t, i) => checkDecimalOctet(t, expected[i]))
-      if (mark) results.forEach((r, i) => markField(inputs[i], r))
-      const worst = results.find((r) => r.status !== 'ok') ?? results[0]
-      answers.push({ label, correct: formatIp(value), given: texts.every((t) => t.trim() === '') ? '' : texts.join('.'), result: worst })
-    }
-    const single = (label: string, correct: string, given: string, result: FieldResult, el: HTMLElement | null) => {
-      if (mark && el) markField(el, result)
-      answers.push({ label, correct, given, result })
-    }
-
-    if (prefixInput) {
-      single('Prefix', `/${ex.prefix}`, prefixInput.value ? `/${prefixInput.value}` : '', checkPrefix(prefixInput.value, ex.prefix), prefixInput)
-    } else {
-      address('mask', 'Subnetmasker', mask)
-    }
-    address('network', 'Netwerkadres', answer.network)
-    address('first', 'Eerste bruikbare adres', answer.firstHost)
-    address('last', 'Laatste bruikbare adres', answer.lastHost)
-    address('broadcast', 'Broadcastadres', answer.broadcast)
-    single('Aantal bruikbare hostadressen', String(answer.hostCount), hostsInput.value, checkInteger(hostsInput.value, answer.hostCount), hostsInput)
+    const address = (name: string, label: string, value: number) => addressAnswer(form, name, label, value, mark)
     const cls = choiceValue(form, 'class')
-    single('Klasse', answer.ipClass, cls ?? '', checkChoice(cls, answer.ipClass), choiceGroup(form, 'class'))
     const sc = choiceValue(form, 'scope')
-    single('Publiek of privaat', scope, sc ?? '', checkChoice(sc, scope), choiceGroup(form, 'scope'))
-    return answers
+    return [
+      prefixInput
+        ? fieldAnswer('Prefix', `/${ex.prefix}`, prefixInput.value ? `/${prefixInput.value}` : '', checkPrefix(prefixInput.value, ex.prefix), prefixInput, mark)
+        : address('mask', 'Subnetmasker', mask),
+      address('network', 'Netwerkadres', answer.network),
+      address('first', 'Eerste bruikbare adres', answer.firstHost),
+      address('last', 'Laatste bruikbare adres', answer.lastHost),
+      address('broadcast', 'Broadcastadres', answer.broadcast),
+      fieldAnswer('Aantal bruikbare hostadressen', String(answer.hostCount), hostsInput.value, checkInteger(hostsInput.value, answer.hostCount), hostsInput, mark),
+      fieldAnswer('Klasse', answer.ipClass, cls ?? '', checkChoice(cls, answer.ipClass), choiceGroup(form, 'class'), mark),
+      fieldAnswer('Publiek of privaat', scope, sc ?? '', checkChoice(sc, scope), choiceGroup(form, 'scope'), mark),
+    ]
   }
 
   form.addEventListener('submit', (e) => {
@@ -154,20 +132,7 @@ export const analyzePage: Page = (root) => {
       <h2>Oplossing</h2>
 
       <h3>Overzicht</h3>
-      <div class="overview">
-        ${answers
-          .map(
-            (a) => `
-          <div class="ov-row ${a.result.status === 'ok' ? 'ov-ok' : a.given ? 'ov-wrong' : 'ov-empty'}">
-            <span class="ov-label">${a.label}</span>
-            <span class="ov-correct mono">${a.correct}</span>
-            <span class="ov-given">${
-              a.result.status === 'ok' ? '✓ juist' : a.given ? `jij: <span class="mono">${a.given}</span>` : 'niet ingevuld'
-            }</span>
-          </div>`,
-          )
-          .join('')}
-      </div>
+      ${overviewHtml(answers)}
 
       <h3>Binaire uitwerking</h3>
       ${andTableHtml(
@@ -186,7 +151,7 @@ export const analyzePage: Page = (root) => {
         <li><strong>Broadcastadres:</strong> dezelfde netwerkbits, alle hostbits op 1 → <span class="mono">${formatIp(answer.broadcast)}</span>.</li>
         <li><strong>Eerste bruikbare adres</strong> = netwerkadres + 1 → <span class="mono">${formatIp(answer.firstHost)}</span>.<br>
             <strong>Laatste bruikbare adres</strong> = broadcastadres − 1 → <span class="mono">${formatIp(answer.lastHost)}</span>.</li>
-        <li><strong>Aantal bruikbare hostadressen</strong> = 2<sup>${hostBits}</sup> − 2 = ${(2 ** hostBits).toLocaleString('nl-BE')} − 2 = <strong>${answer.hostCount.toLocaleString('nl-BE')}</strong>
+        <li><strong>Aantal bruikbare hostadressen</strong> = 2<sup>${hostBits}</sup> − 2 = ${formatCount(2 ** hostBits)} − 2 = <strong>${formatCount(answer.hostCount)}</strong>
             (netwerk- en broadcastadres zijn niet bruikbaar).</li>
         <li><strong>Klasse:</strong> de eerste byte is ${first}, die ligt tussen ${CLASS_RANGES[answer.ipClass]} → klasse <strong>${answer.ipClass}</strong>.</li>
         <li><strong>${scope}:</strong> ${

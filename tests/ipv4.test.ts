@@ -246,3 +246,33 @@ describe('geen supernetting (enkel subnetting)', () => {
     expect(planSubnets(ip('192.168.0.0'), 24, 4).newPrefix).toBe(26)
   })
 })
+
+describe('FLSM-voorbeelden oefening 3 (2^n subnetten, subnet 0 bruikbaar)', () => {
+  it('10.0.0.0/8 in minstens 1000 netwerken → /18', () => {
+    const plan = planSubnets(ip('10.0.0.0'), 8, 1000)
+    expect(plan.borrowedBits).toBe(10)
+    expect(plan.newPrefix).toBe(18)
+    expect(plan.subnetCount).toBe(1024)
+    expect(plan.hostsPerSubnet).toBe(16382)
+    expect(formatIp(subnetAt(plan, 1).network)).toBe('10.0.64.0')
+    expect(formatIp(subnetAt(plan, 1023).broadcast)).toBe('10.255.255.255')
+  })
+
+  it('192.168.10.0/24 in minstens 3 netwerken → /26, subnet 3 = .192 – .255', () => {
+    const plan = planSubnets(ip('192.168.10.0'), 24, 3)
+    expect(plan.newPrefix).toBe(26)
+    expect(plan.subnetCount).toBe(4)
+    const s = subnetAt(plan, 3)
+    expect(formatIp(s.network)).toBe('192.168.10.192')
+    expect(formatIp(s.firstHost)).toBe('192.168.10.193')
+    expect(formatIp(s.lastHost)).toBe('192.168.10.254')
+    expect(formatIp(s.broadcast)).toBe('192.168.10.255')
+  })
+
+  it('/16 naar /24: blokgrootte 1 in de 3e byte', () => {
+    const plan = planSubnets(ip('172.16.0.0'), 16, 200)
+    expect(plan.newPrefix).toBe(24)
+    expect(magicNumber(24)).toBe(1)
+    expect(formatIp(subnetAt(plan, 5).network)).toBe('172.16.5.0')
+  })
+})

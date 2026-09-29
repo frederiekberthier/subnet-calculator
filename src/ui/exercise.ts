@@ -84,3 +84,8 @@ export function feedbackHtml(results: FieldResult[]): string {
     </p>
     ${hints.length ? `<ul class="hints">${hints.map((h) => `<li>${h}</li>`).join('')}</ul>` : ''}`
 }
+
+/** Groot getal met een smalle spatie als duizendtalscheiding (131 070): een punt zou op een IP-adres lijken. */
+export function formatCount(n: number): string {
+  return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f')
+}

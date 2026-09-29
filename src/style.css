@@ -23,6 +23,8 @@
   --bit-off: #edf2f5;
   --host-on: #f7b3d6;
   --host-off: #fdeef6;
+  --sub-on: #ffd84d;
+  --sub-off: #fff7d6;
   --shadow: 0 1px 2px rgb(28 29 30 / 0.04), 0 4px 16px rgb(28 29 30 / 0.06);
   --radius: 16px;
   --font-body: 'Open Sans Variable', 'Open Sans', Arial, Verdana, sans-serif;
@@ -54,6 +56,8 @@
     --bit-off: #2a2e32;
     --host-on: #c2408a;
     --host-off: #3a2231;
+    --sub-on: #c9a300;
+    --sub-off: #3a3418;
     --shadow: none;
   }
 }
@@ -711,6 +715,19 @@ input.is-empty {
   background: var(--host-on);
 }
 
+.at-byte .sub.on {
+  background: var(--sub-on);
+}
+
+.at-byte .sub.off {
+  background: var(--sub-off);
+}
+
+.bs-split .bs-key.at-key-sub {
+  margin-left: 0.75rem;
+  background: var(--sub-on);
+}
+
 .steps {
   margin: 1.25rem 0 0;
   padding-left: 1.4rem;
@@ -718,6 +735,102 @@ input.is-empty {
 
 .steps li {
   margin-bottom: 0.5rem;
+}
+
+/* ---------- Oefening 3: subnetten ---------- */
+
+.form-heading {
+  margin: 0 0 1rem;
+  font-size: 1.2rem;
+}
+
+.form-heading:not(:first-child) {
+  margin-top: 2rem;
+}
+
+.num-input {
+  width: 6rem;
+  padding: 0 0.6rem;
+}
+
+.subnet-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
+  gap: 1rem;
+}
+
+.subnet-card {
+  min-width: 0;
+  margin: 0;
+  padding: 0.75rem 1rem 1rem;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+.subnet-card legend {
+  padding: 0.1rem 0.75rem;
+  border-radius: 999px;
+  background: var(--brand);
+  color: #1c1d1e;
+  font-family: var(--font-heading);
+  font-weight: 800;
+}
+
+.subnet-card .qa {
+  gap: 0.6rem 1rem;
+}
+
+.subnet-card .qa-label {
+  font-size: 0.9rem;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.subnet-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.subnet-table th,
+.subnet-table td {
+  padding: 0.35rem 0.7rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.subnet-table thead th {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--muted);
+  background: var(--bg);
+}
+
+.subnet-table tbody th {
+  font-weight: 800;
+  color: var(--heading);
+}
+
+.subnet-table tr.asked {
+  background: var(--brand-soft);
+}
+
+.all-subnets summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--link);
+}
+
+.small {
+  font-size: 0.85rem;
 }
 
 /* Bitstrook: 4 bytes naast elkaar met gewichten, bits, decimaal en som. */

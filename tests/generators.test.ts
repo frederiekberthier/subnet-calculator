@@ -174,3 +174,19 @@ describe('geen enkele opgave bevat supernetting', () => {
     expect(Math.max(...perClass.C)).toBe(30)
   })
 })
+
+describe('oefening 3: altijd een selectie van 4 subnetten', () => {
+  for (const level of LEVELS) {
+    it(`niveau ${level}: 4 subnetten (of alle bij 2 subnetten), altijd subnet 0, 1 en het laatste`, () => {
+      const rng = createRng(4000 + level)
+      for (let i = 0; i < 2000; i++) {
+        const ex = generateSubnet(rng, level)
+        const expected = Math.min(4, ex.plan.subnetCount)
+        expect(ex.askIndices.length).toBe(expected)
+        expect(ex.askIndices).toContain(0)
+        expect(ex.askIndices).toContain(1)
+        expect(ex.askIndices).toContain(ex.plan.subnetCount - 1)
+      }
+    })
+  }
+})
