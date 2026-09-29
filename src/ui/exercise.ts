@@ -90,7 +90,9 @@ export function wireToolbar(root: HTMLElement, state: ExerciseState): void {
 export function markField(input: HTMLElement, result: FieldResult): boolean {
   input.classList.remove('is-ok', 'is-wrong', 'is-empty')
   input.classList.add(result.status === 'ok' ? 'is-ok' : result.status === 'empty' ? 'is-empty' : 'is-wrong')
+  // De tip staat zichtbaar onder de opgave; showFeedback koppelt ze aan dit veld via aria-describedby.
   input.title = result.status === 'format' ? result.hint : ''
+  if (result.status === 'format') input.dataset.hint = result.hint
   input.setAttribute('aria-invalid', String(result.status !== 'ok'))
   return result.status === 'ok'
 }
@@ -99,7 +101,9 @@ export function clearMarks(root: HTMLElement): void {
   root.querySelectorAll('.is-ok, .is-wrong, .is-empty').forEach((el) => {
     el.classList.remove('is-ok', 'is-wrong', 'is-empty')
     el.removeAttribute('aria-invalid')
+    el.removeAttribute('aria-describedby')
     ;(el as HTMLElement).title = ''
+    delete (el as HTMLElement).dataset.hint
   })
 }
 
@@ -111,10 +115,21 @@ export function feedbackHtml(results: FieldResult[]): string {
   const all = correct === results.length
   return `
     <p class="feedback ${all ? 'feedback-ok' : 'feedback-wrong'}">
-      ${all ? 'Alles juist, goed gedaan!' : `${correct} van ${results.length} velden juist.`}
+      ${all ? '✓ Alles juist, goed gedaan!' : `${correct} van ${results.length} velden juist.`}
       ${!all && empty ? ' Nog niet alle velden zijn ingevuld.' : ''}
     </p>
-    ${hints.length ? `<ul class="hints">${hints.map((h) => `<li>${h}</li>`).join('')}</ul>` : ''}`
+    ${all ? '' : '<p class="legend">✓ juist · ✗ fout · gestreepte rand = nog niet ingevuld</p>'}
+    ${hints.length ? `<ul class="hints">${hints.map((h, i) => `<li id="hint-${i}">${h}</li>`).join('')}</ul>` : ''}`
+}
+
+/** Toon de samenvatting en koppel elke formaattip aan de velden waarvoor ze geldt (issue #8). */
+export function showFeedback(area: HTMLElement, form: HTMLElement, results: FieldResult[]): void {
+  area.innerHTML = feedbackHtml(results)
+  const ids = new Map([...area.querySelectorAll('.hints li')].map((li) => [li.textContent, li.id]))
+  form.querySelectorAll<HTMLElement>('[data-hint]').forEach((el) => {
+    const id = ids.get(el.dataset.hint!)
+    if (id) el.setAttribute('aria-describedby', id)
+  })
 }
 
 /** Groot getal met een smalle spatie als duizendtalscheiding (131 070): een punt zou op een IP-adres lijken. */

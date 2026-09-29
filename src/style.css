@@ -22,6 +22,8 @@
   --err: #c82333;
   --err-bg: #fbe7e9;
   --on-err: #ffffff;
+  --icon-ok: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3.2 3.2L13 5' fill='none' stroke='%2300756f' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --icon-err: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 4l8 8M12 4l-8 8' fill='none' stroke='%23c82333' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E");
   --bit-off: #edf2f5;
   --host-on: #f7b3d6;
   --host-off: #fdeef6;
@@ -57,6 +59,8 @@
     --err: #ff7b86;
     --err-bg: #3a1a1e;
     --on-err: #1c1d1e; /* donkere tekst op het lichte rood: 6.8:1 (issue #10) */
+    --icon-ok: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3.2 3.2L13 5' fill='none' stroke='%233fc9bf' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    --icon-err: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 4l8 8M12 4l-8 8' fill='none' stroke='%23ff7b86' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E");
     --bit-off: #2a2e32;
     --host-on: #e07ab4; /* >= 4.5:1 met donkere bittekst (issue #10) */
     --host-off: #3a2231;
@@ -422,15 +426,35 @@ input.octet,
   width: 4rem;
 }
 
-input.is-ok {
-  border-color: var(--ok);
-  background: var(--ok-bg);
+/* Juist/fout niet enkel met kleur (issue #8): een ✓/✗-icoon in de hoek, fout met dikkere rand,
+   leeg met een neutrale gestreepte rand. */
+input.is-ok,
+input.is-wrong {
+  background-repeat: no-repeat;
+  background-position: right 3px top 3px;
+  background-size: 11px;
 }
 
-input.is-wrong,
+input.is-ok {
+  border-color: var(--ok);
+  background-color: var(--ok-bg);
+  background-image: var(--icon-ok);
+}
+
+input.is-wrong {
+  border: 2.5px solid var(--err);
+  background-color: var(--err-bg);
+  background-image: var(--icon-err);
+}
+
 input.is-empty {
-  border-color: var(--err);
-  background: var(--err-bg);
+  border: 2px dashed var(--muted);
+}
+
+.legend {
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
 }
 
 .actions {
@@ -567,10 +591,31 @@ input.is-empty {
   color: var(--ok);
 }
 
-.choice.is-wrong,
-.choice.is-empty {
-  border-color: var(--err);
+.choice.is-wrong {
+  border: 2.5px solid var(--err);
   background: var(--err-bg);
+}
+
+.choice.is-empty {
+  border: 2px dashed var(--muted);
+}
+
+.choice.is-ok::after,
+.choice.is-wrong::after {
+  display: flex;
+  align-items: center;
+  padding: 0 0.7rem;
+  font-weight: 800;
+}
+
+.choice.is-ok::after {
+  content: '✓';
+  color: var(--ok);
+}
+
+.choice.is-wrong::after {
+  content: '✗';
+  color: var(--err);
 }
 
 .choice.is-wrong input:checked + span {

@@ -3,7 +3,7 @@ import { generateBinary, type Direction } from '../lib/generators'
 import { formatBinary, formatIp, prefixToMask, toOctets } from '../lib/ipv4'
 import type { Page } from '../router'
 import { bitStripHtml } from '../ui/bitstrip'
-import { clearMarks, feedbackHtml, levelSelectHtml, markField, readState, showSolution, wireToolbar } from '../ui/exercise'
+import { clearMarks, levelSelectHtml, markField, readState, showFeedback, showSolution, wireToolbar } from '../ui/exercise'
 import { octetInputs, octetInputsHtml, octetValues, wireOctetInputs } from '../ui/octets'
 
 const PATH = '/omrekenen'
@@ -112,7 +112,7 @@ export const binaryPage: Page = (root) => {
     const r = checkPrefix(prefixInput.value, ex.prefix)
     markField(prefixInput, r)
     results.push(r)
-    feedback.innerHTML = feedbackHtml(results)
+    showFeedback(feedback, form, results)
     // Een zichtbare oplossing mee bijwerken, anders toont ze nog de vorige antwoorden (issue #3).
     if (!solution.hidden) renderSolution()
   })

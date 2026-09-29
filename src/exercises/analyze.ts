@@ -4,7 +4,7 @@ import { formatIp, prefixToMask, toOctets } from '../lib/ipv4'
 import type { Page } from '../router'
 import { andTableHtml } from '../ui/andtable'
 import { choiceGroup, choiceHtml, choiceValue } from '../ui/choice'
-import { clearMarks, feedbackHtml, formatCount, levelSelectHtml, readState, showSolution, wireToolbar } from '../ui/exercise'
+import { clearMarks, formatCount, levelSelectHtml, readState, showFeedback, showSolution, wireToolbar } from '../ui/exercise'
 import { octetInputs, octetInputsHtml, wireOctetInputs } from '../ui/octets'
 import { addressAnswer, fieldAnswer, overviewHtml, type Answer } from '../ui/overview'
 
@@ -121,7 +121,7 @@ export const analyzePage: Page = (root) => {
   form.addEventListener('submit', (e) => {
     e.preventDefault()
     clearMarks(form)
-    feedback.innerHTML = feedbackHtml(evaluate(true).map((a) => a.result))
+    showFeedback(feedback, form, evaluate(true).map((a) => a.result))
     // Een zichtbare oplossing mee bijwerken, anders toont ze nog de vorige antwoorden (issue #3).
     if (!solution.hidden) renderSolution()
   })

@@ -3,7 +3,7 @@ import { generateSubnet } from '../lib/generators'
 import { formatIp, interestingOctet, magicNumber, prefixToMask, subnetAt, toOctets, type NetworkInfo } from '../lib/ipv4'
 import type { Page } from '../router'
 import { andTableHtml } from '../ui/andtable'
-import { clearMarks, feedbackHtml, formatCount as fmt, levelSelectHtml, readState, showSolution, wireToolbar } from '../ui/exercise'
+import { clearMarks, formatCount as fmt, levelSelectHtml, readState, showFeedback, showSolution, wireToolbar } from '../ui/exercise'
 import { octetInputsHtml, wireOctetInputs } from '../ui/octets'
 import { addressAnswer, fieldAnswer, overviewHtml, type Answer } from '../ui/overview'
 
@@ -122,7 +122,7 @@ export const subnetPage: Page = (root) => {
   form.addEventListener('submit', (e) => {
     e.preventDefault()
     clearMarks(form)
-    feedback.innerHTML = feedbackHtml(evaluate(true).map((a) => a.result))
+    showFeedback(feedback, form, evaluate(true).map((a) => a.result))
     // Een zichtbare oplossing mee bijwerken, anders toont ze nog de vorige antwoorden (issue #3).
     if (!solution.hidden) renderSolution()
   })
