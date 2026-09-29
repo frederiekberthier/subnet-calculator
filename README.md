@@ -10,7 +10,7 @@ Online: <https://www.graduaatiot.be/subnetting/>
 2. **Adresanalyse** – netwerkadres, eerste/laatste bruikbare adres, broadcast, aantal bruikbare hostadressen, klasse, publiek/privaat en het masker in de andere notatie.
 3. **Subnetten** – een netwerk splitsen in minstens N even grote subnetten: geleende bits, nieuw masker, aantal subnetten, hosts per subnet en 4 subnetten volledig uitschrijven.
 
-Elke oefening heeft drie niveaus: **Basis** (standaardprefix van de klasse), **Gevorderd** (/24–/30) en **Expert**.
+Elke oefening heeft drie niveaus: **Basis**, **Gevorderd** en **Expert**. Bij omrekenen en adresanalyse gebruikt Basis de standaardprefix van de klasse, Gevorderd /24–/30 en Expert elke toegelaten prefix. Bij subnetten start Basis van een /24 (tot 8 netwerken), Gevorderd van een /16 of /24 (tot 32) en Expert van elke toegelaten prefix tot /26 (tot 64).
 
 ## Didactische regels
 Deze regels zitten in de rekenkern (`src/lib/ipv4.ts`) en worden door tests bewaakt:
