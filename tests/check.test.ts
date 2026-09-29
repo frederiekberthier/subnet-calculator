@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { checkBinaryOctet, checkChoice, checkDecimalOctet, checkInteger, checkIp, checkPrefix } from '../src/lib/check'
+import {
+  checkBinaryOctet,
+  checkChoice,
+  checkDecimalOctet,
+  checkInteger,
+  checkIp,
+  checkPrefix,
+  splitAddressInput,
+} from '../src/lib/check'
 
 const status = (r: { status: string }) => r.status
 
@@ -61,5 +69,26 @@ describe('checkChoice', () => {
     expect(status(checkChoice('B', 'B'))).toBe('ok')
     expect(status(checkChoice('C', 'B'))).toBe('wrong')
     expect(status(checkChoice(null, 'B'))).toBe('empty')
+  })
+})
+
+describe('splitAddressInput (plakken, issue #11)', () => {
+  it("decimaal met punten, komma's of spaties", () => {
+    expect(splitAddressInput('192.168.1.10', false)).toEqual(['192', '168', '1', '10'])
+    expect(splitAddressInput(' 10,0,0,1 ', false)).toEqual(['10', '0', '0', '1'])
+    expect(splitAddressInput('172 16 0 0', false)).toEqual(['172', '16', '0', '0'])
+    expect(splitAddressInput('255.255.240', false)).toEqual(['255', '255', '240'])
+  })
+
+  it('binair met punten of 32 bits aan één stuk', () => {
+    expect(splitAddressInput('11000000.10101000.00000001.00001010', true)).toEqual(['11000000', '10101000', '00000001', '00001010'])
+    expect(splitAddressInput('11000000101010000000000100001010', true)).toEqual(['11000000', '10101000', '00000001', '00001010'])
+  })
+
+  it('geen splitsing voor één byte of ongeldige tekst', () => {
+    expect(splitAddressInput('192', false)).toEqual([])
+    expect(splitAddressInput('10101000', true)).toEqual([])
+    expect(splitAddressInput('<b>1.2.3.4</b>', false)).toEqual([])
+    expect(splitAddressInput('1.2.3.x', false)).toEqual([])
   })
 })
