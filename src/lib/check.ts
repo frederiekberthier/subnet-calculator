@@ -1,5 +1,4 @@
 // Antwoorden van studenten normaliseren en vergelijken met de verwachte waarde.
-import { parseIp } from './ipv4'
 
 export type FieldResult =
   | { status: 'ok' }
@@ -31,14 +30,6 @@ export function checkPrefix(input: string, expected: number): FieldResult {
   if (t === '') return EMPTY
   if (!/^\d{1,2}$/.test(t) || Number(t) > 32) return { status: 'format', hint: 'Een prefix is een getal van 0 tot 32, bv. /24.' }
   return Number(t) === expected ? OK : WRONG
-}
-
-export function checkIp(input: string, expected: number): FieldResult {
-  const t = input.trim()
-  if (t === '') return EMPTY
-  const ip = parseIp(t)
-  if (ip === null) return { status: 'format', hint: 'Schrijf een IPv4-adres als vier getallen (0-255) gescheiden door punten.' }
-  return ip === expected ? OK : WRONG
 }
 
 export function checkInteger(input: string, expected: number): FieldResult {

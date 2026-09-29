@@ -68,22 +68,6 @@ export function formatBinary(ip: number): string {
   return toBinaryOctets(ip).join('.')
 }
 
-/** Parse één binair octet (1 tot 8 bits), of null. */
-export function parseBinaryOctet(text: string): number | null {
-  const t = text.trim()
-  if (!/^[01]{1,8}$/.test(t)) return null
-  return parseInt(t, 2)
-}
-
-/** Parse een binair adres met 4 octetten gescheiden door punten, of null. */
-export function parseBinaryIp(text: string): number | null {
-  const parts = text.trim().split('.')
-  if (parts.length !== 4) return null
-  const octets = parts.map(parseBinaryOctet)
-  if (octets.some((o) => o === null)) return null
-  return fromOctets(octets as number[])
-}
-
 export function prefixToMask(prefix: number): number {
   if (!Number.isInteger(prefix) || prefix < 0 || prefix > 32) {
     throw new RangeError(`Ongeldige prefix: ${prefix}`)
@@ -98,22 +82,6 @@ export function maskToPrefix(mask: number): number | null {
   // Een geldig masker is 1-en gevolgd door 0-en: de inverse + 1 is dan een macht van 2.
   if ((inverted & (inverted + 1)) !== 0) return null
   return Math.clz32(inverted)
-}
-
-export function isValidMask(mask: number): boolean {
-  return maskToPrefix(mask) !== null
-}
-
-/** Parse "255.255.255.0", "/24" of "24" naar een prefixlengte, of null. */
-export function parseMask(text: string): number | null {
-  const t = text.trim()
-  const cidr = /^\/?\s*(\d{1,2})$/.exec(t)
-  if (cidr) {
-    const p = Number(cidr[1])
-    return p <= 32 ? p : null
-  }
-  const mask = parseIp(t)
-  return mask === null ? null : maskToPrefix(mask)
 }
 
 export function formatCidr(ip: number, prefix: number): string {

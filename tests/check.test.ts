@@ -4,7 +4,6 @@ import {
   checkChoice,
   checkDecimalOctet,
   checkInteger,
-  checkIp,
   checkPrefix,
   splitAddressInput,
 } from '../src/lib/check'
@@ -42,15 +41,6 @@ describe('checkPrefix', () => {
     expect(status(checkPrefix('25', 24))).toBe('wrong')
     expect(status(checkPrefix('33', 24))).toBe('format')
     expect(status(checkPrefix('255.255.255.0', 24))).toBe('format')
-  })
-})
-
-describe('checkIp', () => {
-  it('vergelijkt adressen', () => {
-    expect(status(checkIp('192.168.1.0', 0xc0a80100))).toBe('ok')
-    expect(status(checkIp(' 192.168.001.000 ', 0xc0a80100))).toBe('ok')
-    expect(status(checkIp('192.168.1.1', 0xc0a80100))).toBe('wrong')
-    expect(status(checkIp('192.168.1', 0xc0a80100))).toBe('format')
   })
 })
 
