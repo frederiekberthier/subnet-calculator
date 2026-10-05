@@ -21,7 +21,7 @@ import type { Rng } from './random'
  * Verhoog dit getal bij ELKE wijziging die de opgave voor een seed verandert; de snapshot-test in
  * tests/generators.test.ts faalt tot dan.
  */
-export const GENERATOR_VERSION = 2
+export const GENERATOR_VERSION = 3
 
 /** 1 = classful (/8, /16, /24), 2 = grens in het laatste octet (/24-/30), 3 = willekeurige prefix. */
 export type Level = 1 | 2 | 3
@@ -175,7 +175,10 @@ export function generateSubnet(rng: Rng, level: Level): SubnetExercise {
   // niveau Expert maar in ±5% van de opgaves voor (issue #20).
   const cls = level === 1 ? 'C' : rng.pick(['A', 'B', 'C'] as const)
   const prefix = rng.pick(settings.prefixes.filter((p) => p >= defaultPrefix(cls)!))
-  const network = networkAddress(randomAddress(rng, cls), prefix)
+  // Subnetting doe je enkel op private adressen (RFC 1918): 10.0.0.0/8 (A), 172.16.0.0/12 (B),
+  // 192.168.0.0/16 (C). Omdat de prefix nooit korter is dan de standaardprefix van de klasse,
+  // liggen ook alle subnetten volledig in het privébereik.
+  const network = networkAddress(privateAddress(rng, cls), prefix)
   const maxBits = Math.min(MAX_USABLE_PREFIX - prefix, Math.log2(settings.maxRequested))
   // Meestal geen macht van 2, zodat de student moet afronden naar boven.
   const requested = rng.chance(0.3) ? 2 ** rng.int(1, maxBits) : rng.int(3, 2 ** maxBits - 1)

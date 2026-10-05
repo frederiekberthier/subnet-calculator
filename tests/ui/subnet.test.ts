@@ -53,3 +53,28 @@ describe('oefening 3: subnetten genummerd vanaf 1', () => {
     expect(marked).toEqual(ex.askIndices.map((i) => i + 1))
   })
 })
+
+describe('binaire uitwerking toont alle gevraagde subnetten', () => {
+  /** Eerste seed (niveau 1) waarvoor het aantal subnetten aan de voorwaarde voldoet. */
+  const seedWhere = (ok: (count: number) => boolean) => {
+    for (let seed = 1; seed < 10000; seed++) if (ok(generateSubnet(createRng(seed), 1).plan.subnetCount)) return seed
+    throw new Error('geen seed gevonden')
+  }
+
+  for (const [title, seed] of [
+    ['precies 4 subnetten (ook subnet 3)', seedWhere((c) => c === 4)],
+    ['meer dan 4 subnetten (ook het willekeurige subnet)', seedWhere((c) => c > 4)],
+    ['2 subnetten', seedWhere((c) => c === 2)],
+  ] as const) {
+    it(title, () => {
+      location.hash = `#/subnetten?seed=${seed}&niveau=1`
+      document.body.innerHTML = '<main id="app"></main>'
+      const page = document.querySelector<HTMLElement>('#app')!
+      subnetPage(page)
+      page.querySelector<HTMLButtonElement>('[data-action="solution"]')!.click()
+      const cards = [...page.querySelectorAll('.subnet-card legend')].map((l) => l.textContent)
+      const binaryRows = [...page.querySelectorAll('.at-label')].map((l) => l.textContent).filter((t) => t!.startsWith('Subnet'))
+      expect(binaryRows).toEqual(cards)
+    })
+  }
+})

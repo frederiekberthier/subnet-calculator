@@ -16,6 +16,7 @@ import {
   isSubnettingAllowed,
   MAX_USABLE_PREFIX,
   networkAddress,
+  subnetAt,
 } from '../src/lib/ipv4'
 import { createRng, parseSeed } from '../src/lib/random'
 
@@ -243,4 +244,20 @@ describe('vaste opgaves per seed', () => {
     }
     expect(out).toMatchSnapshot()
   })
+})
+
+describe('oefening 3: enkel private netwerken', () => {
+  for (const level of LEVELS) {
+    it(`niveau ${level}: startnetwerk en alle subnetten liggen in een privébereik (RFC 1918)`, () => {
+      const rng = createRng(3300 + level)
+      for (let i = 0; i < 5000; i++) {
+        const ex = generateSubnet(rng, level)
+        const label = `${ex.network}/${ex.prefix}`
+        expect(isPrivate(ex.network), label).toBe(true)
+        // Eerste en laatste adres van het hele netwerk: dan zit alles ertussen ook in het privébereik.
+        expect(isPrivate(subnetAt(ex.plan, 0).network), label).toBe(true)
+        expect(isPrivate(subnetAt(ex.plan, ex.plan.subnetCount - 1).broadcast), label).toBe(true)
+      }
+    })
+  }
 })

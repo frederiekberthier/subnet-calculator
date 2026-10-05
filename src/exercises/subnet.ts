@@ -186,9 +186,8 @@ export const subnetPage: Page = (root) => {
         [
           { label: 'Oud masker', value: oldMask },
           { label: 'Nieuw masker', value: newMask },
-          { label: subnetName(0), value: all[0].network, ruleAbove: 'subnetten' },
-          ...(plan.subnetCount > 2 ? [{ label: subnetName(1), value: all[1].network }] : []),
-          { label: subnetName(last), value: all[last].network },
+          // Precies de subnetten die de student moest uitschrijven (ook het willekeurig gekozen subnet).
+          ...ex.askIndices.map((i, k) => ({ label: subnetName(i), value: all[i].network, ruleAbove: k === 0 ? 'subnetten' : undefined })),
         ],
         plan.newPrefix,
         ex.prefix,
