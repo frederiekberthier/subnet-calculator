@@ -17,10 +17,11 @@ Deze regels zitten in de rekenkern (`src/lib/ipv4.ts`) en worden door tests bewa
 - **Bruikbaar** = een adres dat aan een toestel gekoppeld kan worden. Daarom is **/30** de grootste prefix; /31 en /32 komen nooit voor.
 - **Nooit supernetting**: de prefix is nooit korter dan de standaardprefix van de klasse (A /8, B /16, C /24) – zie `isSubnettingAllowed`.
 - Bij n geleende bits zijn er **2ⁿ subnetten**, genummerd vanaf **subnet 1** (het eerste subnet, vroeger ook "subnet zero" genoemd, is bruikbaar).
+- **Subnetten enkel op private adressen**: het startnetwerk van oefening 3 ligt altijd in 10.0.0.0/8 (klasse A), 172.16.0.0/12 (B) of 192.168.0.0/16 (C), en daardoor ook alle subnetten. Omrekenen en adresanalyse gebruiken zowel publieke als private adressen (bij adresanalyse moet de student dat net bepalen).
 - Het gegeven IP-adres of startnetwerk ligt nooit in een speciaal bereik (0.x, 127.x, 169.254.x, 100.64.0.0/10, documentatiebereiken, klasse D/E).
 
 ## Opgave delen
-Elke opgave heeft een eigen link, bv. `https://www.graduaatiot.be/subnetting/#/analyse?seed=42&niveau=3&v=2`:
+Elke opgave heeft een eigen link, bv. `https://www.graduaatiot.be/subnetting/#/analyse?seed=42&niveau=3&v=3`:
 - `seed` – bepaalt de opgave (dezelfde seed geeft dezelfde opgave)
 - `niveau` – 1 = Basis, 2 = Gevorderd, 3 = Expert
 - `richting` – enkel bij Omrekenen: `dec2bin` of `bin2dec`
