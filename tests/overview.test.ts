@@ -5,7 +5,7 @@ import { summarize } from '../src/ui/overview'
 const ok: FieldResult = { status: 'ok' }
 const empty: FieldResult = { status: 'empty' }
 const wrong: FieldResult = { status: 'wrong' }
-const format: FieldResult = { status: 'format', hint: 'Een byte is een getal van 0 tot 255.' }
+const format: FieldResult = { status: 'format', hint: 'byteRange' }
 
 describe('summarize (issue #14)', () => {
   it('formaatfout gaat voor op een leeg vakje ervoor', () => {

@@ -1,13 +1,25 @@
+import { t } from './i18n'
+
 export type Page = (root: HTMLElement) => void
 
-const SITE_TITLE = 'Subnetting oefenen'
+export interface Router {
+  /** Pagina opnieuw tonen (bv. na een taalwissel) met behoud van ingevulde antwoorden, feedback en oplossing. */
+  rerender: () => void
+}
 
 function currentPath(): string {
   return location.hash.replace(/^#/, '').split('?')[0] || '/'
 }
 
+/** Sleutel per invoerveld, zodat waarden na het opnieuw tonen van de pagina teruggezet kunnen worden. */
+function fieldKey(input: HTMLInputElement): string {
+  if (input.type === 'radio') return `radio:${input.name}:${input.value}`
+  if (input.dataset.field) return `octet:${input.dataset.field}:${input.dataset.index}`
+  return `id:${input.id}`
+}
+
 // Eenvoudige hash-router: werkt zonder serverconfiguratie, ook in een submap op de FTP-server.
-export function startRouter(root: HTMLElement, routes: Record<string, Page>, notFound: Page): void {
+export function startRouter(root: HTMLElement, routes: Record<string, Page>, notFound: Page): Router {
   const render = () => {
     const path = currentPath()
     root.replaceChildren()
@@ -20,8 +32,9 @@ export function startRouter(root: HTMLElement, routes: Record<string, Page>, not
       else a.removeAttribute('aria-current')
     })
     // Paginatitel volgt de kop, bv. "Omrekenen – Subnetting oefenen" (issue #15).
+    const site = t().site.title
     const h1 = root.querySelector('h1')?.textContent?.replace(/^\d+\.\s*/, '') ?? ''
-    document.title = h1 && h1 !== SITE_TITLE ? `${h1} – ${SITE_TITLE}` : SITE_TITLE
+    document.title = h1 && h1 !== site ? `${h1} – ${site}` : site
   }
   const navigate = () => {
     render()
@@ -47,4 +60,25 @@ export function startRouter(root: HTMLElement, routes: Record<string, Page>, not
     if (link && link.getAttribute('href') === `#${currentPath()}`) e.preventDefault()
   })
   render()
+
+  return {
+    rerender: () => {
+      // Dezelfde opgave (seed staat in de URL); antwoorden, feedback en oplossing blijven behouden.
+      const values = new Map(
+        [...root.querySelectorAll<HTMLInputElement>('input')].map((el) => [fieldKey(el), el.type === 'radio' ? el.checked : el.value]),
+      )
+      const hadFeedback = (root.querySelector('.feedback-area')?.innerHTML.trim() ?? '') !== ''
+      const hadSolution = root.querySelector<HTMLElement>('.solution')?.hidden === false
+      const scroll = window.scrollY
+      render()
+      root.querySelectorAll<HTMLInputElement>('input').forEach((el) => {
+        const value = values.get(fieldKey(el))
+        if (typeof value === 'boolean') el.checked = value
+        else if (typeof value === 'string') el.value = value
+      })
+      if (hadFeedback) root.querySelector('form')?.dispatchEvent(new Event('submit', { cancelable: true }))
+      if (hadSolution) root.querySelector<HTMLElement>('[data-action="solution"]')?.click()
+      window.scrollTo(0, scroll)
+    },
+  }
 }

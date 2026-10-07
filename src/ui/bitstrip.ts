@@ -1,5 +1,6 @@
 // Horizontale bitstrook: de 4 bytes naast elkaar, zoals in de les op het bord.
 // Per byte: gewichten (128 ... 1), de bits, het decimale getal en de som.
+import { t } from '../i18n'
 import { escapeHtml } from '../lib/html'
 import { octetToBinary, toOctets } from '../lib/ipv4'
 
@@ -26,18 +27,18 @@ export function bitStripHtml(value: number, { title, prefix, wrongAnswers = [] }
       return `
         <div class="bs-byte${wrong !== null && wrong !== undefined ? ' bs-wrong' : ''}">
           <div class="bs-row bs-weights" aria-hidden="true">${WEIGHTS.map((w) => `<span>${w}</span>`).join('')}</div>
-          <div class="bs-row bs-bits" role="img" aria-label="Byte ${i + 1}: ${bits}">${[...bits].map((bit) => `<span class="${bit === '1' ? 'on' : 'off'}">${bit}</span>`).join('')}</div>
+          <div class="bs-row bs-bits" role="img" aria-label="${t().bits.byte} ${i + 1}: ${bits}">${[...bits].map((bit) => `<span class="${bit === '1' ? 'on' : 'off'}">${bit}</span>`).join('')}</div>
           ${bar}
           <div class="bs-dec">${octet}</div>
           <div class="bs-sum">${terms.length ? terms.join('+') : '0'}</div>
-          ${wrong !== null && wrong !== undefined ? `<div class="bs-yours">jij: <span class="mono">${escapeHtml(wrong)}</span></div>` : ''}
+          ${wrong !== null && wrong !== undefined ? `<div class="bs-yours">${t().feedback.you} <span class="mono">${escapeHtml(wrong)}</span></div>` : ''}
         </div>`
     })
     .join('')
   const split =
     prefix === undefined
       ? ''
-      : `<p class="bs-split"><span class="bs-key net"></span>${prefix} netwerkbits <span class="bs-key host"></span>${32 - prefix} hostbits</p>`
+      : `<p class="bs-split"><span class="bs-key net"></span>${t().bits.networkBits(prefix)} <span class="bs-key host"></span>${t().bits.hostBits(32 - prefix)}</p>`
   return `
     <figure class="bitstrip">
       <figcaption>${title}</figcaption>

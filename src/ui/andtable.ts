@@ -1,6 +1,7 @@
 // Binaire AND-uitwerking: IP-adres en masker onder elkaar, daaronder netwerk- en broadcastadres.
 // De grens tussen netwerk- en hostdeel is een verticale lijn; het hostdeel heeft een eigen kleur.
 // Met oldPrefix (subnetten) krijgen de geleende subnetbits een derde kleur.
+import { t } from '../i18n'
 import { formatIp, formatBinary } from '../lib/ipv4'
 
 interface Row {
@@ -34,10 +35,11 @@ function bitsHtml(value: number, prefix: number, oldPrefix: number): string {
 
 export function andTableHtml(rows: Row[], prefix: number, oldPrefix = prefix): string {
   const subBits = prefix - oldPrefix
+  const b = t().bits
   return `
-    <div class="and-table" role="table" aria-label="Binaire uitwerking">
+    <div class="and-table" role="table" aria-label="${b.table}">
       <div class="sr-only" role="row">
-        <span role="columnheader">Adres</span><span role="columnheader">Binair</span><span role="columnheader">Decimaal</span>
+        <span role="columnheader">${b.colAddress}</span><span role="columnheader">${b.colBinary}</span><span role="columnheader">${b.colDecimal}</span>
       </div>
       ${rows
         .map(
@@ -52,8 +54,8 @@ export function andTableHtml(rows: Row[], prefix: number, oldPrefix = prefix): s
         .join('')}
     </div>
     <p class="bs-split">
-      <span class="bs-key net"></span>${oldPrefix} netwerkbits
-      ${subBits > 0 ? `<span class="bs-key at-key-sub"></span>${subBits} subnetbits` : ''}
-      <span class="bs-key host at-key-host"></span>${32 - prefix} hostbits
+      <span class="bs-key net"></span>${b.networkBits(oldPrefix)}
+      ${subBits > 0 ? `<span class="bs-key at-key-sub"></span>${b.subnetBits(subBits)}` : ''}
+      <span class="bs-key host at-key-host"></span>${b.hostBits(32 - prefix)}
     </p>`
 }

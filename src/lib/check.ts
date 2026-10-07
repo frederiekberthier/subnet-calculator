@@ -1,9 +1,13 @@
 // Antwoorden van studenten normaliseren en vergelijken met de verwachte waarde.
+import type { Messages } from '../i18n/nl'
+
+/** Sleutel van een formaattip; de tekst komt uit het woordenboek van de gekozen taal. */
+export type HintKey = keyof Messages['hints']
 
 export type FieldResult =
   | { status: 'ok' }
   | { status: 'empty' }
-  | { status: 'format'; hint: string }
+  | { status: 'format'; hint: HintKey }
   | { status: 'wrong' }
 
 const OK: FieldResult = { status: 'ok' }
@@ -13,29 +17,29 @@ const WRONG: FieldResult = { status: 'wrong' }
 export function checkDecimalOctet(input: string, expected: number): FieldResult {
   const t = input.trim()
   if (t === '') return EMPTY
-  if (!/^\d{1,3}$/.test(t) || Number(t) > 255) return { status: 'format', hint: 'Een byte is een getal van 0 tot 255.' }
+  if (!/^\d{1,3}$/.test(t) || Number(t) > 255) return { status: 'format', hint: 'byteRange' }
   return Number(t) === expected ? OK : WRONG
 }
 
 export function checkBinaryOctet(input: string, expected: number): FieldResult {
   const t = input.replace(/\s/g, '')
   if (t === '') return EMPTY
-  if (!/^[01]+$/.test(t)) return { status: 'format', hint: 'Gebruik enkel 0 en 1.' }
-  if (t.length !== 8) return { status: 'format', hint: 'Schrijf elke byte met precies 8 bits (vul aan met nullen vooraan).' }
+  if (!/^[01]+$/.test(t)) return { status: 'format', hint: 'binaryOnly' }
+  if (t.length !== 8) return { status: 'format', hint: 'eightBits' }
   return parseInt(t, 2) === expected ? OK : WRONG
 }
 
 export function checkPrefix(input: string, expected: number): FieldResult {
   const t = input.trim().replace(/^\/\s*/, '')
   if (t === '') return EMPTY
-  if (!/^\d{1,2}$/.test(t) || Number(t) > 32) return { status: 'format', hint: 'Een prefix is een getal van 0 tot 32, bv. /24.' }
+  if (!/^\d{1,2}$/.test(t) || Number(t) > 32) return { status: 'format', hint: 'prefixRange' }
   return Number(t) === expected ? OK : WRONG
 }
 
 export function checkInteger(input: string, expected: number): FieldResult {
   const t = input.trim().replace(/[.\s]/g, '')
   if (t === '') return EMPTY
-  if (!/^\d+$/.test(t)) return { status: 'format', hint: 'Geef een geheel getal.' }
+  if (!/^\d+$/.test(t)) return { status: 'format', hint: 'integer' }
   return Number(t) === expected ? OK : WRONG
 }
 

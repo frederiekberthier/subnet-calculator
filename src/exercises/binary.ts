@@ -1,3 +1,4 @@
+import { t } from '../i18n'
 import { checkBinaryOctet, checkDecimalOctet, checkPrefix, type FieldResult } from '../lib/check'
 import { generateBinary, type Direction } from '../lib/generators'
 import { formatBinary, formatIp, prefixToMask, toOctets } from '../lib/ipv4'
@@ -7,12 +8,11 @@ import { clearMarks, focusAfterNew, levelSelectHtml, outdatedNoticeHtml, markFie
 import { octetInputs, octetInputsHtml, octetValues, wireOctetInputs } from '../ui/octets'
 
 const PATH = '/omrekenen'
-const DIRECTIONS: Record<string, string> = {
-  willekeurig: 'Willekeurig',
-  dec2bin: 'Decimaal → binair',
-  bin2dec: 'Binair → decimaal',
-}
+/** Waarden van de richting in de URL; de labels komen uit het woordenboek. */
+const DIRECTIONS = ['willekeurig', 'dec2bin', 'bin2dec'] as const
+
 export const binaryPage: Page = (root) => {
+  const m = t()
   const state = readState(PATH, ['niveau', 'richting'])
   const choice = state.params.get('richting') ?? 'willekeurig'
   const direction: Direction | undefined = choice === 'dec2bin' || choice === 'bin2dec' ? choice : undefined
@@ -24,48 +24,42 @@ export const binaryPage: Page = (root) => {
   const show = (v: number) => (toBinary ? formatIp(v) : formatBinary(v)).replaceAll('.', '.<wbr>')
 
   root.innerHTML = `
-    <h1>1. Omrekenen</h1>
-    <p class="subtitle">binair ↔ decimaal</p>
+    <h1>${m.convert.title}</h1>
+    <p class="subtitle">${m.convert.subtitle}</p>
     <p class="lead">
-      ${
-        toBinary
-          ? 'Zet het IP-adres en het subnetmasker om naar binair: 8 bits per byte.'
-          : 'Zet het IP-adres en het subnetmasker om naar decimaal: een getal van 0 tot 255 per byte.'
-      }
-      Geef ook de prefix van het subnetmasker.
+      ${toBinary ? m.convert.leadToBinary : m.convert.leadToDecimal}
+      ${m.convert.leadPrefix}
     </p>
 
     <div class="toolbar">
       ${levelSelectHtml(state.level)}
-      <label class="control">Richting
+      <label class="control">${m.convert.direction}
         <select data-setting="richting">
-          ${Object.entries(DIRECTIONS)
-            .map(([v, label]) => `<option value="${v}" ${v === choice ? 'selected' : ''}>${label}</option>`)
-            .join('')}
+          ${DIRECTIONS.map((v) => `<option value="${v}" ${v === choice ? 'selected' : ''}>${m.convert.directions[v]}</option>`).join('')}
         </select>
       </label>
-      <button type="button" class="btn" data-action="new">Nieuwe oefening</button>
+      <button type="button" class="btn" data-action="new">${m.common.newExercise}</button>
     </div>
     ${outdatedNoticeHtml(state)}
 
     <form class="panel exercise" novalidate>
       <div class="qa">
-        <div class="qa-label">IP-adres</div>
+        <div class="qa-label">${m.common.ipAddress}</div>
         <div class="given mono">${show(ex.ip)}</div>
-        ${octetInputsHtml('ip', answerKind, 'IP-adres')}
+        ${octetInputsHtml('ip', answerKind, m.common.ipAddress)}
 
-        <div class="qa-label">Subnetmasker</div>
+        <div class="qa-label">${m.common.subnetMask}</div>
         <div class="given mono">${show(mask)}</div>
-        ${octetInputsHtml('mask', answerKind, 'Subnetmasker')}
+        ${octetInputsHtml('mask', answerKind, m.common.subnetMask)}
 
-        <label class="qa-label" for="prefix">Prefix</label>
-        <div class="given muted">aantal 1-bits in het masker</div>
+        <label class="qa-label" for="prefix">${m.common.prefix}</label>
+        <div class="given muted">${m.convert.prefixHint}</div>
         <div class="prefix-input"><span>/</span><input id="prefix" inputmode="numeric" maxlength="3" autocomplete="off"></div>
       </div>
 
       <div class="actions">
-        <button type="submit" class="btn btn-primary">Controleer</button>
-        <button type="button" class="btn" data-action="solution">Toon oplossing</button>
+        <button type="submit" class="btn btn-primary">${m.common.check}</button>
+        <button type="button" class="btn" data-action="solution">${m.common.showSolution}</button>
       </div>
       <div class="feedback-area" aria-live="polite"></div>
     </form>
@@ -121,10 +115,10 @@ export const binaryPage: Page = (root) => {
   // De oplossing wordt pas bij het klikken opgebouwd, zodat foute bytes van de student gemarkeerd worden.
   const renderSolution = () => {
     solution.innerHTML = `
-      <h2>Oplossing</h2>
-      ${bitStripHtml(ex.ip, { title: `IP-adres ${formatIp(ex.ip)}`, wrongAnswers: wrongAnswers('ip', ex.ip) })}
-      ${bitStripHtml(mask, { title: `Subnetmasker ${formatIp(mask)}`, prefix: ex.prefix, wrongAnswers: wrongAnswers('mask', mask) })}
-      <p>Het subnetmasker bevat <strong>${ex.prefix}</strong> enen op rij, dus de prefix is <strong>/${ex.prefix}</strong>.</p>`
+      <h2>${m.common.solution}</h2>
+      ${bitStripHtml(ex.ip, { title: `${m.common.ipAddress} ${formatIp(ex.ip)}`, wrongAnswers: wrongAnswers('ip', ex.ip) })}
+      ${bitStripHtml(mask, { title: `${m.common.subnetMask} ${formatIp(mask)}`, prefix: ex.prefix, wrongAnswers: wrongAnswers('mask', mask) })}
+      <p>${m.convert.prefixExplained(ex.prefix)}</p>`
   }
 
   root.querySelector('[data-action="solution"]')!.addEventListener('click', () => {

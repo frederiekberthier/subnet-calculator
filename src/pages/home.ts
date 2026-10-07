@@ -1,29 +1,18 @@
+import { t } from '../i18n'
 import type { Page } from '../router'
 
-const exercises = [
-  {
-    href: '#/omrekenen',
-    title: 'Omrekenen',
-    text: 'Zet een IPv4-adres en subnetmasker om van decimaal naar binair en omgekeerd.',
-  },
-  {
-    href: '#/analyse',
-    title: 'Adresanalyse',
-    text: 'Bepaal netwerkadres, eerste en laatste host, broadcast, klasse en publiek/privaat.',
-  },
-  {
-    href: '#/subnetten',
-    title: 'Subnetten',
-    text: 'Splits een netwerk in een gevraagd aantal kleinere subnetten.',
-  },
-]
-
 export const homePage: Page = (root) => {
+  const m = t()
+  const exercises = [
+    { href: '#/omrekenen', title: m.nav.convert, text: m.home.cards.convert },
+    { href: '#/analyse', title: m.nav.analysis, text: m.home.cards.analysis },
+    { href: '#/subnetten', title: m.nav.subnetting, text: m.home.cards.subnetting },
+  ]
   root.innerHTML = `
     <section class="hero">
-      <p class="eyebrow">Graduaat Internet of Things</p>
-      <h1>Subnetting oefenen</h1>
-      <p class="lead">Onbeperkt oefenen op IPv4-adressen en subnetten, met meteen feedback en een uitgewerkte oplossing.</p>
+      <p class="eyebrow">${m.home.eyebrow}</p>
+      <h1>${m.site.title}</h1>
+      <p class="lead">${m.home.lead}</p>
     </section>
     <div class="cards">
       ${exercises
@@ -33,7 +22,7 @@ export const homePage: Page = (root) => {
           <span class="card-nr" aria-hidden="true">${i + 1}</span>
           <h2>${e.title}</h2>
           <p>${e.text}</p>
-          <span class="card-cta">Start oefening <span aria-hidden="true">›››</span></span>
+          <span class="card-cta">${m.home.start} <span aria-hidden="true">›››</span></span>
         </a>`,
         )
         .join('')}
@@ -41,5 +30,5 @@ export const homePage: Page = (root) => {
 }
 
 export const notFoundPage: Page = (root) => {
-  root.innerHTML = `<h1>Pagina niet gevonden</h1><p><a href="#/">Terug naar de startpagina</a></p>`
+  root.innerHTML = `<h1>${t().notFound.title}</h1><p><a href="#/">${t().notFound.back}</a></p>`
 }

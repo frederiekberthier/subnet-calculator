@@ -1,3 +1,4 @@
+import { t } from '../i18n'
 import { checkInteger, checkPrefix } from '../lib/check'
 import { generateSubnet } from '../lib/generators'
 import { formatIp, interestingOctet, magicNumber, prefixToMask, subnetAt, toOctets, type NetworkInfo } from '../lib/ipv4'
@@ -8,23 +9,24 @@ import { octetInputsHtml, wireOctetInputs } from '../ui/octets'
 import { addressAnswer, fieldAnswer, overviewHtml, type Answer } from '../ui/overview'
 
 const PATH = '/subnetten'
-const BYTE_NAMES = ['1e', '2e', '3e', '4e']
 
 /**
  * Naam van een subnet zoals de student ze ziet. Intern tellen we vanaf 0 (subnet i begint op
  * netwerk + i × blokgrootte), maar in de opleiding heet het eerste subnet "subnet 1".
  */
-const subnetName = (index: number) => `Subnet ${index + 1}`
+const subnetName = (index: number) => t().subnetting.name(index + 1)
 
-/** De vier adressen die per gevraagd subnet ingevuld worden. */
-const SUBNET_FIELDS: ReadonlyArray<[key: keyof NetworkInfo, label: string]> = [
-  ['network', 'Netwerkadres'],
-  ['firstHost', 'Eerste bruikbare adres'],
-  ['lastHost', 'Laatste bruikbare adres'],
-  ['broadcast', 'Broadcastadres'],
+/** De vier adressen die per gevraagd subnet ingevuld worden (labels uit het woordenboek). */
+const SUBNET_FIELDS: ReadonlyArray<[key: keyof NetworkInfo, label: () => string]> = [
+  ['network', () => t().common.networkAddress],
+  ['firstHost', () => t().common.firstUsable],
+  ['lastHost', () => t().common.lastUsable],
+  ['broadcast', () => t().common.broadcast],
 ]
 
 export const subnetPage: Page = (root) => {
+  const m = t()
+  const s = m.subnetting
   const state = readState(PATH)
   const ex = generateSubnet(state.rng, state.level)
   const { plan } = ex
@@ -38,40 +40,36 @@ export const subnetPage: Page = (root) => {
     <div class="prefix-input">${prefix ? `<span>${prefix}</span>` : ''}<input id="${id}" class="num-input mono" inputmode="numeric" autocomplete="off"></div>`
 
   root.innerHTML = `
-    <h1>3. Subnetten</h1>
-    <p class="subtitle">een netwerk opsplitsen in kleinere netwerken</p>
-    <p class="lead">
-      Verdeel het netwerk in minstens het gevraagde aantal even grote subnetten. Bereken hoeveel bits je leent,
-      het nieuwe subnetmasker en hoeveel subnetten en bruikbare hostadressen je krijgt. Schrijf daarna de
-      gevraagde subnetten volledig uit. De subnetten zijn genummerd vanaf <strong>subnet 1</strong>.
-    </p>
+    <h1>${s.title}</h1>
+    <p class="subtitle">${s.subtitle}</p>
+    <p class="lead">${s.lead}</p>
 
     <div class="toolbar">
       ${levelSelectHtml(state.level)}
-      <button type="button" class="btn" data-action="new">Nieuwe oefening</button>
+      <button type="button" class="btn" data-action="new">${m.common.newExercise}</button>
     </div>
     ${outdatedNoticeHtml(state)}
 
     <div class="panel assignment">
-      <div><span class="assignment-label">Netwerk</span><span class="assignment-value mono">${formatIp(ex.network)}</span></div>
-      <div><span class="assignment-label">Subnetmasker</span><span class="assignment-value mono">${
+      <div><span class="assignment-label">${m.common.network}</span><span class="assignment-value mono">${formatIp(ex.network)}</span></div>
+      <div><span class="assignment-label">${m.common.subnetMask}</span><span class="assignment-value mono">${
         ex.maskNotation === 'dotted' ? formatIp(oldMask) : `/${ex.prefix}`
       }</span></div>
-      <div><span class="assignment-label">Gevraagd</span><span class="assignment-value">minstens ${ex.requested} netwerken</span></div>
+      <div><span class="assignment-label">${s.requested}</span><span class="assignment-value">${s.atLeast(ex.requested)}</span></div>
     </div>
 
     <form class="panel exercise" novalidate>
-      <h2 class="form-heading">Berekening</h2>
+      <h2 class="form-heading">${s.calculation}</h2>
       <div class="qa qa-2">
-        ${numberRow('borrowed', 'Aantal geleende bits')}
-        <div class="qa-label">Nieuw subnetmasker</div>
-        ${octetInputsHtml('newmask', 'dec', 'Nieuw subnetmasker')}
-        ${numberRow('newprefix', 'Nieuwe prefix', '/')}
-        ${numberRow('subnets', 'Aantal subnetten')}
-        ${numberRow('hosts', 'Bruikbare hostadressen per subnet')}
+        ${numberRow('borrowed', s.borrowedBits)}
+        <div class="qa-label">${s.newMask}</div>
+        ${octetInputsHtml('newmask', 'dec', s.newMask)}
+        ${numberRow('newprefix', s.newPrefix, '/')}
+        ${numberRow('subnets', s.subnetCount)}
+        ${numberRow('hosts', s.hostsPerSubnet)}
       </div>
 
-      <h2 class="form-heading">Subnetten uitschrijven</h2>
+      <h2 class="form-heading">${s.writeOut}</h2>
       <div class="subnet-cards">
         ${asked
           .map(
@@ -79,7 +77,7 @@ export const subnetPage: Page = (root) => {
           <fieldset class="subnet-card">
             <legend>${subnetName(index)}</legend>
             <div class="qa qa-2">
-              ${SUBNET_FIELDS.map(([key, label]) => `<div class="qa-label">${label}</div>${octetInputsHtml(`s${index}-${key}`, 'dec', `${subnetName(index)}, ${label}`)}`).join('')}
+              ${SUBNET_FIELDS.map(([key, label]) => `<div class="qa-label">${label()}</div>${octetInputsHtml(`s${index}-${key}`, 'dec', `${subnetName(index)}, ${label()}`)}`).join('')}
             </div>
           </fieldset>`,
           )
@@ -87,8 +85,8 @@ export const subnetPage: Page = (root) => {
       </div>
 
       <div class="actions">
-        <button type="submit" class="btn btn-primary">Controleer</button>
-        <button type="button" class="btn" data-action="solution">Toon oplossing</button>
+        <button type="submit" class="btn btn-primary">${m.common.check}</button>
+        <button type="button" class="btn" data-action="solution">${m.common.showSolution}</button>
       </div>
       <div class="feedback-area" aria-live="polite"></div>
     </form>
@@ -115,13 +113,13 @@ export const subnetPage: Page = (root) => {
       fieldAnswer(label, fmt(expected), input(id).value, checkInteger(input(id).value, expected), input(id), mark)
     const prefixValue = input('newprefix').value
     return [
-      number('borrowed', 'Aantal geleende bits', plan.borrowedBits),
-      addressAnswer(form, 'newmask', 'Nieuw subnetmasker', newMask, mark),
-      fieldAnswer('Nieuwe prefix', `/${plan.newPrefix}`, prefixValue ? `/${prefixValue}` : '', checkPrefix(prefixValue, plan.newPrefix), input('newprefix'), mark),
-      number('subnets', 'Aantal subnetten', plan.subnetCount),
-      number('hosts', 'Bruikbare hostadressen per subnet', plan.hostsPerSubnet),
+      number('borrowed', s.borrowedBits, plan.borrowedBits),
+      addressAnswer(form, 'newmask', s.newMask, newMask, mark),
+      fieldAnswer(s.newPrefix, `/${plan.newPrefix}`, prefixValue ? `/${prefixValue}` : '', checkPrefix(prefixValue, plan.newPrefix), input('newprefix'), mark),
+      number('subnets', s.subnetCount, plan.subnetCount),
+      number('hosts', s.hostsPerSubnet, plan.hostsPerSubnet),
       ...asked.flatMap(({ index, info }) =>
-        SUBNET_FIELDS.map(([key, label]) => addressAnswer(form, `s${index}-${key}`, `${subnetName(index)} – ${label.toLowerCase()}`, info[key], mark)),
+        SUBNET_FIELDS.map(([key, label]) => addressAnswer(form, `s${index}-${key}`, `${subnetName(index)} – ${label().toLowerCase()}`, info[key], mark)),
       ),
     ]
   }
@@ -138,21 +136,22 @@ export const subnetPage: Page = (root) => {
     const answers = evaluate(false)
     const n = plan.borrowedBits
     const byte = interestingOctet(plan.newPrefix)
+    const maskByte = toOctets(newMask)[byte]
     const magic = magicNumber(plan.newPrefix)
     const last = plan.subnetCount - 1
     const askedSet = new Set(ex.askIndices)
     const all = Array.from({ length: plan.subnetCount }, (_, i) => subnetAt(plan, i))
     const table = `
-      <div class="table-scroll" tabindex="0" role="region" aria-label="Alle subnetten (scrollbaar)">
+      <div class="table-scroll" tabindex="0" role="region" aria-label="${s.allSubnetsRegion}">
         <table class="subnet-table mono">
-          <thead><tr><th>Subnet</th><th>Netwerkadres</th><th>Eerste bruikbare</th><th>Laatste bruikbare</th><th>Broadcast</th></tr></thead>
+          <thead><tr><th>${s.col.subnet}</th><th>${s.col.network}</th><th>${s.col.first}</th><th>${s.col.last}</th><th>${s.col.broadcast}</th></tr></thead>
           <tbody>
             ${all
               .map(
-                (s, i) => `
+                (sub, i) => `
               <tr class="${askedSet.has(i) ? 'asked' : ''}">
                 <th scope="row">${i + 1}</th>
-                <td>${formatIp(s.network)}</td><td>${formatIp(s.firstHost)}</td><td>${formatIp(s.lastHost)}</td><td>${formatIp(s.broadcast)}</td>
+                <td>${formatIp(sub.network)}</td><td>${formatIp(sub.firstHost)}</td><td>${formatIp(sub.lastHost)}</td><td>${formatIp(sub.broadcast)}</td>
               </tr>`,
               )
               .join('')}
@@ -161,45 +160,40 @@ export const subnetPage: Page = (root) => {
       </div>`
 
     solution.innerHTML = `
-      <h2>Oplossing</h2>
+      <h2>${m.common.solution}</h2>
 
-      <h3>Overzicht</h3>
+      <h3>${m.common.overview}</h3>
       ${overviewHtml(answers)}
 
-      <h3>Stappen</h3>
+      <h3>${m.common.steps}</h3>
       <ol class="steps">
-        <li><strong>Geleende bits:</strong> zoek het kleinste aantal bits n waarvoor 2<sup>n</sup> ≥ ${ex.requested}.
-          ${n > 1 ? `2<sup>${n - 1}</sup> = ${2 ** (n - 1)} is te weinig, ` : ''}2<sup>${n}</sup> = ${2 ** n} is genoeg → <strong>${n} bit${n === 1 ? '' : 's'}</strong>.</li>
-        <li><strong>Nieuwe prefix</strong> = /${ex.prefix} + ${n} = <strong>/${plan.newPrefix}</strong>
-          → nieuw subnetmasker <span class="mono">${formatIp(newMask)}</span>.</li>
-        <li><strong>Aantal subnetten</strong> = 2<sup>${n}</sup> = <strong>${fmt(plan.subnetCount)}</strong> (subnet 1 tot en met subnet ${last + 1}).</li>
-        <li><strong>Bruikbare hostadressen per subnet:</strong> er blijven ${hostBits} hostbits over →
-          2<sup>${hostBits}</sup> − 2 = ${fmt(2 ** hostBits)} − 2 = <strong>${fmt(plan.hostsPerSubnet)}</strong>.</li>
-        <li><strong>Blokgrootte:</strong> in de ${BYTE_NAMES[byte]} byte is het nieuwe masker ${toOctets(newMask)[byte]},
-          dus 256 − ${toOctets(newMask)[byte]} = <strong>${magic}</strong>. Elk volgend subnet begint ${magic} hoger in de ${BYTE_NAMES[byte]} byte.</li>
-        <li><strong>Per subnet:</strong> eerste bruikbare = netwerkadres + 1, broadcast = volgend netwerkadres − 1,
-          laatste bruikbare = broadcast − 1.</li>
+        <li>${s.stepBorrowed(ex.requested, n)}</li>
+        <li>${s.stepPrefix(ex.prefix, n, plan.newPrefix, formatIp(newMask))}</li>
+        <li>${s.stepCount(n, fmt(plan.subnetCount), last + 1)}</li>
+        <li>${s.stepHosts(hostBits, fmt(2 ** hostBits), fmt(plan.hostsPerSubnet))}</li>
+        <li>${s.stepBlock(s.byteNames[byte], maskByte, magic)}</li>
+        <li>${s.stepPerSubnet}</li>
       </ol>
 
-      <h3>Binaire uitwerking</h3>
+      <h3>${m.common.binaryWork}</h3>
       ${andTableHtml(
         [
-          { label: 'Oud masker', value: oldMask },
-          { label: 'Nieuw masker', value: newMask },
+          { label: s.oldMaskRow, value: oldMask },
+          { label: s.newMaskRow, value: newMask },
           // Precies de subnetten die de student moest uitschrijven (ook het willekeurig gekozen subnet).
-          ...ex.askIndices.map((i, k) => ({ label: subnetName(i), value: all[i].network, ruleAbove: k === 0 ? 'subnetten' : undefined })),
+          ...ex.askIndices.map((i, k) => ({ label: subnetName(i), value: all[i].network, ruleAbove: k === 0 ? s.subnetsRule : undefined })),
         ],
         plan.newPrefix,
         ex.prefix,
       )}
 
-      <h3>Alle subnetten</h3>
+      <h3>${s.allSubnets}</h3>
       ${
         plan.subnetCount > 16
-          ? `<details class="all-subnets"><summary>Toon alle ${plan.subnetCount} subnetten</summary>${table}</details>`
+          ? `<details class="all-subnets"><summary>${s.showAll(plan.subnetCount)}</summary>${table}</details>`
           : table
       }
-      <p class="muted small">De gevraagde subnetten zijn gemarkeerd.</p>`
+      <p class="muted small">${s.askedMarked}</p>`
   }
 
   root.querySelector('[data-action="solution"]')!.addEventListener('click', () => {

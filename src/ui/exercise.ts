@@ -1,6 +1,7 @@
 // Gedeelde bouwstenen voor de oefenpagina's: instellingen in de URL, werkbalk en veldfeedback.
+import { t } from '../i18n'
 import type { FieldResult } from '../lib/check'
-import { GENERATOR_VERSION, LEVEL_NAMES, LEVELS, type Level } from '../lib/generators'
+import { GENERATOR_VERSION, LEVELS, type Level } from '../lib/generators'
 import { createRng, parseSeed, randomSeed, type Rng } from '../lib/random'
 
 export interface ExerciseState {
@@ -91,16 +92,15 @@ export function goToNew(state: ExerciseState, changes: Record<string, string> = 
 /** Melding als een gedeelde link met een oudere versie van de site gemaakt werd. */
 export function outdatedNoticeHtml(state: ExerciseState): string {
   return state.outdated
-    ? `<p class="notice" role="status">Deze link werd met een oudere versie van de site gemaakt. De opgave kan
-       daardoor verschillen van de opgave die gedeeld werd.</p>`
+    ? `<p class="notice" role="status">${t().common.outdated}</p>`
     : ''
 }
 
 export function levelSelectHtml(level: Level): string {
   return `
-    <label class="control">Niveau
+    <label class="control">${t().common.level}
       <select data-setting="niveau">
-        ${LEVELS.map((l) => `<option value="${l}" ${l === level ? 'selected' : ''}>${LEVEL_NAMES[l]}</option>`).join('')}
+        ${LEVELS.map((l) => `<option value="${l}" ${l === level ? 'selected' : ''}>${t().common.levels[l]}</option>`).join('')}
       </select>
     </label>`
 }
@@ -118,8 +118,9 @@ export function markField(input: HTMLElement, result: FieldResult): boolean {
   input.classList.remove('is-ok', 'is-wrong', 'is-empty')
   input.classList.add(result.status === 'ok' ? 'is-ok' : result.status === 'empty' ? 'is-empty' : 'is-wrong')
   // De tip staat zichtbaar onder de opgave; showFeedback koppelt ze aan dit veld via aria-describedby.
-  input.title = result.status === 'format' ? result.hint : ''
-  if (result.status === 'format') input.dataset.hint = result.hint
+  const hint = result.status === 'format' ? t().hints[result.hint] : ''
+  input.title = hint
+  if (hint) input.dataset.hint = hint
   input.setAttribute('aria-invalid', String(result.status !== 'ok'))
   return result.status === 'ok'
 }
@@ -137,15 +138,16 @@ export function clearMarks(root: HTMLElement): void {
 /** Samenvatting onder de opgave, met de unieke formaattips. */
 export function feedbackHtml(results: FieldResult[]): string {
   const correct = results.filter((r) => r.status === 'ok').length
-  const hints = [...new Set(results.flatMap((r) => (r.status === 'format' ? [r.hint] : [])))]
+  const hints = [...new Set(results.flatMap((r) => (r.status === 'format' ? [t().hints[r.hint]] : [])))]
+  const f = t().feedback
   const empty = results.some((r) => r.status === 'empty')
   const all = correct === results.length
   return `
     <p class="feedback ${all ? 'feedback-ok' : 'feedback-wrong'}">
-      ${all ? '✓ Alles juist, goed gedaan!' : `${correct} van ${results.length} velden juist.`}
-      ${!all && empty ? ' Nog niet alle velden zijn ingevuld.' : ''}
+      ${all ? f.allCorrect : f.summary(correct, results.length)}
+      ${!all && empty ? f.notAllFilled : ''}
     </p>
-    ${all ? '' : '<p class="legend">✓ juist · ✗ fout · gestreepte rand = nog niet ingevuld</p>'}
+    ${all ? '' : `<p class="legend">${f.legend}</p>`}
     ${hints.length ? `<ul class="hints">${hints.map((h, i) => `<li id="hint-${i}">${h}</li>`).join('')}</ul>` : ''}`
 }
 

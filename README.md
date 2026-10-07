@@ -1,6 +1,6 @@
 # Subnetting oefenen
 
-Oefenplatform voor IPv4-subnetting voor de studenten van het **Graduaat Internet of Things** (Howest).
+Oefenplatform voor IPv4-subnetting voor de studenten van het **Graduaat Internet of Things** (Howest), in het Nederlands en het Engels.
 Studenten krijgen onbeperkt nieuwe opgaves, meteen feedback per veld en een uitgewerkte oplossing.
 
 Online: <https://www.graduaatiot.be/subnetting/>
@@ -11,6 +11,14 @@ Online: <https://www.graduaatiot.be/subnetting/>
 3. **Subnetten** – een netwerk splitsen in minstens N even grote subnetten: geleende bits, nieuw masker, aantal subnetten, hosts per subnet en 4 subnetten volledig uitschrijven.
 
 Elke oefening heeft drie niveaus: **Basis**, **Gevorderd** en **Expert**. Bij omrekenen en adresanalyse gebruikt Basis de standaardprefix van de klasse, Gevorderd /24–/30 en Expert elke toegelaten prefix. Bij subnetten start Basis van een /24 (tot 8 netwerken), Gevorderd van een /16 of /24 (tot 32) en Expert van elke toegelaten prefix tot /26 (tot 64).
+
+## Talen (Nederlands / English)
+De site is volledig beschikbaar in het Nederlands en het Engels. Rechtsboven in het menu kies je **NL** of **EN**; de keuze wordt onthouden.
+
+Een link in een bepaalde taal: voeg `?lang=en` (of `?lang=nl`) toe vóór de `#`, bv.
+`https://www.graduaatiot.be/subnetting/?lang=en` of `https://www.graduaatiot.be/subnetting/?lang=en#/subnetten`.
+
+Alle teksten staan in `src/i18n/nl.ts` en `src/i18n/en.ts`. Een nieuwe tekst moet in **beide** woordenboeken komen: TypeScript en de test `tests/ui/i18n.test.ts` falen anders (die controleert ook dat er nergens Nederlands in de Engelse versie staat).
 
 ## Didactische regels
 Deze regels zitten in de rekenkern (`src/lib/ipv4.ts`) en worden door tests bewaakt:
@@ -52,4 +60,5 @@ De build gebruikt relatieve paden (`base: './'` in `vite.config.ts`) en hash-rou
 - `src/lib/` – rekenkern (`ipv4.ts`), opgavegenerators, random met seed, controle van antwoorden
 - `src/exercises/` – de drie oefenpagina's
 - `src/ui/` – gedeelde onderdelen (invoervakjes, feedback, oplossingsweergave)
+- `src/i18n/` – teksten in het Nederlands en het Engels, en de taalkeuze
 - `tests/` – Vitest-tests; `tests/ui/` draait in happy-dom

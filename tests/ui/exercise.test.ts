@@ -87,13 +87,12 @@ describe('feedback per veld (issues #8 en #14)', () => {
 
   it('showFeedback koppelt formaattips via aria-describedby aan de velden', () => {
     const form = document.querySelector('form')!
-    const hint = 'Een byte is een getal van 0 tot 255.'
-    const results: FieldResult[] = [{ status: 'ok' }, { status: 'format', hint }, { status: 'empty' }]
+    const results: FieldResult[] = [{ status: 'ok' }, { status: 'format', hint: 'byteRange' }, { status: 'empty' }]
     ;['#a', '#b', '#c'].forEach((id, i) => markField(document.querySelector(id)!, results[i]))
     showFeedback(document.querySelector('#area')!, form, results)
     const b = document.querySelector('#b')!
     const describedBy = b.getAttribute('aria-describedby')!
-    expect(document.getElementById(describedBy)!.textContent).toBe(hint)
+    expect(document.getElementById(describedBy)!.textContent).toBe('Een byte is een getal van 0 tot 255.')
     expect(document.querySelector('#a')!.hasAttribute('aria-describedby')).toBe(false)
     expect(document.querySelector('#area')!.textContent).toContain('1 van 3 velden juist')
     expect(document.querySelector('#c')!.classList.contains('is-empty')).toBe(true)
