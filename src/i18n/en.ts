@@ -5,7 +5,7 @@ export const en: Messages = {
   site: {
     title: 'Subnetting practice',
     description:
-      'Practise IPv4 subnetting: binary ↔ decimal conversion, address analysis and subnetting, with instant feedback and worked solutions. Associate degree Internet of Things, Howest.',
+      'Practise IPv4 subnetting: binary ↔ decimal conversion, address analysis and subnetting, with instant feedback and detailed solutions. Associate degree Internet of Things, Howest.',
     skip: 'Skip to content',
     brandLabel: 'Subnetting practice, home page',
     brandSub: 'Howest IoT',
@@ -30,7 +30,7 @@ export const en: Messages = {
   },
   home: {
     eyebrow: 'Associate degree Internet of Things',
-    lead: 'Unlimited practice with IPv4 addresses and subnets, with instant feedback and a worked solution.',
+    lead: 'Unlimited practice with IPv4 addresses and subnets, with instant feedback and a detailed solution.',
     start: 'Start exercise',
     cards: {
       convert: 'Convert an IPv4 address and subnet mask from decimal to binary and back.',
@@ -57,10 +57,10 @@ export const en: Messages = {
     prefix: 'Prefix',
     network: 'Network',
     networkAddress: 'Network address',
-    firstUsable: 'First usable address',
-    lastUsable: 'Last usable address',
+    firstUsable: 'First host address',
+    lastUsable: 'Last host address',
     broadcast: 'Broadcast address',
-    usableHosts: 'Number of usable host addresses',
+    usableHosts: 'Number of host addresses',
     outdated:
       'This link was created with an older version of the site. The exercise may therefore differ from the one that was shared.',
   },
@@ -104,8 +104,8 @@ export const en: Messages = {
   },
   analysis: {
     title: '2. Address analysis',
-    subtitle: 'network, usable addresses and broadcast',
-    lead: 'For this IP address, find the network address, the first and last usable address, the broadcast address and the number of usable host addresses. Also give the class, whether the address is public or private, and the subnet mask in the other notation.',
+    subtitle: 'network, host addresses and broadcast',
+    lead: 'For this IP address, find the network address, the first and last host address, the broadcast address and the number of host addresses. Also give the class, whether the address is public or private, and the subnet mask in the other notation.',
     class: 'Class',
     scope: 'Public or private',
     public: 'Public',
@@ -116,9 +116,9 @@ export const en: Messages = {
     stepBroadcast: (bc: string) =>
       `<strong>Broadcast address:</strong> the same network bits, all host bits set to 1 → <span class="mono">${bc}</span>.`,
     stepFirstLast: (first: string, last: string) =>
-      `<strong>First usable address</strong> = network address + 1 → <span class="mono">${first}</span>.<br><strong>Last usable address</strong> = broadcast address − 1 → <span class="mono">${last}</span>.`,
+      `<strong>First host address</strong> = network address + 1 → <span class="mono">${first}</span>.<br><strong>Last host address</strong> = broadcast address − 1 → <span class="mono">${last}</span>.`,
     stepHosts: (hostBits: number, total: string, usable: string) =>
-      `<strong>Number of usable host addresses</strong> = 2<sup>${hostBits}</sup> − 2 = ${total} − 2 = <strong>${usable}</strong> (the network and broadcast addresses are not usable).`,
+      `<strong>Number of host addresses</strong> = 2<sup>${hostBits}</sup> − 2 = ${total} − 2 = <strong>${usable}</strong> (the network and broadcast addresses are not usable).`,
     stepClass: (first: number, from: number, to: number, cls: string) =>
       `<strong>Class:</strong> the first byte is ${first}, which lies between ${from} and ${to} → class <strong>${cls}</strong>.`,
     stepPrivate: '<strong>Private:</strong> the address lies in a private range (RFC 1918).',
@@ -128,7 +128,7 @@ export const en: Messages = {
   subnetting: {
     title: '3. Subnetting',
     subtitle: 'splitting a network into smaller networks',
-    lead: 'Divide the network into at least the requested number of equally sized subnets. Work out how many bits you borrow, the new subnet mask and how many subnets and usable host addresses you get. Then write out the requested subnets in full. The subnets are numbered from <strong>subnet 1</strong>.',
+    lead: 'Divide the network into at least the requested number of equally sized subnets. Work out how many bits you borrow, the new subnet mask and how many subnets and host addresses you get. Then write out the requested subnets in full. The subnets are numbered from <strong>subnet 1</strong>.',
     requested: 'Requested',
     atLeast: (n: number) => `at least ${n} networks`,
     calculation: 'Calculation',
@@ -136,7 +136,7 @@ export const en: Messages = {
     newMask: 'New subnet mask',
     newPrefix: 'New prefix',
     subnetCount: 'Number of subnets',
-    hostsPerSubnet: 'Usable host addresses per subnet',
+    hostsPerSubnet: 'Host addresses per subnet',
     writeOut: 'Write out the subnets',
     name: (n: number) => `Subnet ${n}`,
     oldMaskRow: 'Old mask',
@@ -146,21 +146,20 @@ export const en: Messages = {
     allSubnetsRegion: 'All subnets (scrollable)',
     showAll: (n: number) => `Show all ${n} subnets`,
     askedMarked: 'The requested subnets are highlighted.',
-    col: { subnet: 'Subnet', network: 'Network address', first: 'First usable', last: 'Last usable', broadcast: 'Broadcast' },
+    col: { subnet: 'Subnet', network: 'Network address', first: 'First host', last: 'Last host', broadcast: 'Broadcast' },
     byteNames: ['1st', '2nd', '3rd', '4th'],
     stepBorrowed: (requested: number, n: number) =>
-      `<strong>Borrowed bits:</strong> find the smallest number of bits n for which 2<sup>n</sup> ≥ ${requested}. ${
-        n > 1 ? `2<sup>${n - 1}</sup> = ${2 ** (n - 1)} is too few, ` : ''
+      `<strong>Borrowed bits:</strong> find the smallest number of bits n for which 2<sup>n</sup> ≥ ${requested}. ${n > 1 ? `2<sup>${n - 1}</sup> = ${2 ** (n - 1)} is too few, ` : ''
       }2<sup>${n}</sup> = ${2 ** n} is enough → <strong>${n} bit${n === 1 ? '' : 's'}</strong>.`,
     stepPrefix: (oldP: number, n: number, newP: number, mask: string) =>
       `<strong>New prefix</strong> = /${oldP} + ${n} = <strong>/${newP}</strong> → new subnet mask <span class="mono">${mask}</span>.`,
     stepCount: (n: number, count: string, last: number) =>
       `<strong>Number of subnets</strong> = 2<sup>${n}</sup> = <strong>${count}</strong> (subnet 1 up to and including subnet ${last}).`,
     stepHosts: (hostBits: number, total: string, usable: string) =>
-      `<strong>Usable host addresses per subnet:</strong> ${hostBits} host bits remain → 2<sup>${hostBits}</sup> − 2 = ${total} − 2 = <strong>${usable}</strong>.`,
+      `<strong>Host addresses per subnet:</strong> ${hostBits} host bits remain → 2<sup>${hostBits}</sup> − 2 = ${total} − 2 = <strong>${usable}</strong>.`,
     stepBlock: (byteName: string, maskByte: number, magic: number) =>
       `<strong>Block size:</strong> in the ${byteName} byte the new mask is ${maskByte}, so 256 − ${maskByte} = <strong>${magic}</strong>. Each next subnet starts ${magic} higher in the ${byteName} byte.`,
     stepPerSubnet:
-      '<strong>Per subnet:</strong> first usable = network address + 1, broadcast = next network address − 1, last usable = broadcast − 1.',
+      '<strong>Per subnet:</strong> first host = network address + 1, broadcast = next network address − 1, last host = broadcast − 1.',
   },
 }
