@@ -1,3 +1,4 @@
+import { t } from '../i18n'
 import { checkChoice, checkInteger, checkPrefix } from '../lib/check'
 import { generateAnalyze } from '../lib/generators'
 import { formatIp, prefixToMask, toOctets } from '../lib/ipv4'
@@ -10,46 +11,50 @@ import { addressAnswer, fieldAnswer, overviewHtml, type Answer } from '../ui/ove
 
 const PATH = '/analyse'
 const CLASSES = ['A', 'B', 'C', 'D', 'E'] as const
-const SCOPES = ['Publiek', 'Privaat'] as const
 
-const CLASS_RANGES: Record<string, string> = {
-  A: '0 en 127',
-  B: '128 en 191',
-  C: '192 en 223',
-  D: '224 en 239',
-  E: '240 en 255',
+/** Bereik van de eerste byte per klasse. */
+const CLASS_RANGES: Record<string, readonly [number, number]> = {
+  A: [0, 127],
+  B: [128, 191],
+  C: [192, 223],
+  D: [224, 239],
+  E: [240, 255],
 }
 
 export const analyzePage: Page = (root) => {
+  const m = t()
   const state = readState(PATH)
   const ex = generateAnalyze(state.rng, state.level)
   const { answer } = ex
   const mask = prefixToMask(ex.prefix)
   const maskGivenDotted = ex.maskNotation === 'dotted'
-  const scope = answer.isPrivate ? 'Privaat' : 'Publiek'
+  // De waarde (public/private) is in elke taal gelijk; enkel het label wordt vertaald.
+  const scopes = [
+    ['public', m.analysis.public],
+    ['private', m.analysis.private],
+  ] as const
+  const scope = answer.isPrivate ? 'private' : 'public'
+  const scopeLabel = answer.isPrivate ? m.analysis.private : m.analysis.public
+  const scopeLabelOf = (value: string | null) => scopes.find(([v]) => v === value)?.[1] ?? ''
 
   const addressRow = (name: string, label: string) => `
     <div class="qa-label">${label}</div>
     ${octetInputsHtml(name, 'dec', label)}`
 
   root.innerHTML = `
-    <h1>2. Adresanalyse</h1>
-    <p class="subtitle">netwerk, bruikbare adressen en broadcast</p>
-    <p class="lead">
-      Bepaal voor dit IP-adres het netwerkadres, het eerste en laatste bruikbare adres, het broadcastadres en
-      het aantal bruikbare hostadressen. Geef ook de klasse, of het adres publiek of privaat is, en het
-      subnetmasker in de andere notatie.
-    </p>
+    <h1>${m.analysis.title}</h1>
+    <p class="subtitle">${m.analysis.subtitle}</p>
+    <p class="lead">${m.analysis.lead}</p>
 
     <div class="toolbar">
       ${levelSelectHtml(state.level)}
-      <button type="button" class="btn" data-action="new">Nieuwe oefening</button>
+      <button type="button" class="btn" data-action="new">${m.common.newExercise}</button>
     </div>
     ${outdatedNoticeHtml(state)}
 
     <div class="panel assignment">
-      <div><span class="assignment-label">IP-adres</span><span class="assignment-value mono">${formatIp(ex.ip)}</span></div>
-      <div><span class="assignment-label">Subnetmasker</span><span class="assignment-value mono">${
+      <div><span class="assignment-label">${m.common.ipAddress}</span><span class="assignment-value mono">${formatIp(ex.ip)}</span></div>
+      <div><span class="assignment-label">${m.common.subnetMask}</span><span class="assignment-value mono">${
         maskGivenDotted ? formatIp(mask) : `/${ex.prefix}`
       }</span></div>
     </div>
@@ -58,28 +63,28 @@ export const analyzePage: Page = (root) => {
       <div class="qa qa-2">
         ${
           maskGivenDotted
-            ? `<label class="qa-label" for="prefix">Prefix</label>
+            ? `<label class="qa-label" for="prefix">${m.common.prefix}</label>
                <div class="prefix-input"><span>/</span><input id="prefix" inputmode="numeric" maxlength="2" autocomplete="off"></div>`
-            : addressRow('mask', 'Subnetmasker')
+            : addressRow('mask', m.common.subnetMask)
         }
-        ${addressRow('network', 'Netwerkadres')}
-        ${addressRow('first', 'Eerste bruikbare adres')}
-        ${addressRow('last', 'Laatste bruikbare adres')}
-        ${addressRow('broadcast', 'Broadcastadres')}
+        ${addressRow('network', m.common.networkAddress)}
+        ${addressRow('first', m.common.firstUsable)}
+        ${addressRow('last', m.common.lastUsable)}
+        ${addressRow('broadcast', m.common.broadcast)}
 
-        <label class="qa-label" for="hosts">Aantal bruikbare hostadressen</label>
+        <label class="qa-label" for="hosts">${m.common.usableHosts}</label>
         <input id="hosts" class="hosts-input mono" inputmode="numeric" autocomplete="off">
 
-        <div class="qa-label">Klasse</div>
-        ${choiceHtml('class', 'Klasse', CLASSES)}
+        <div class="qa-label">${m.analysis.class}</div>
+        ${choiceHtml('class', m.analysis.class, CLASSES.map((c) => [c, c] as const))}
 
-        <div class="qa-label">Publiek of privaat</div>
-        ${choiceHtml('scope', 'Publiek of privaat', SCOPES)}
+        <div class="qa-label">${m.analysis.scope}</div>
+        ${choiceHtml('scope', m.analysis.scope, scopes)}
       </div>
 
       <div class="actions">
-        <button type="submit" class="btn btn-primary">Controleer</button>
-        <button type="button" class="btn" data-action="solution">Toon oplossing</button>
+        <button type="submit" class="btn btn-primary">${m.common.check}</button>
+        <button type="button" class="btn" data-action="solution">${m.common.showSolution}</button>
       </div>
       <div class="feedback-area" aria-live="polite"></div>
     </form>
@@ -107,15 +112,15 @@ export const analyzePage: Page = (root) => {
     const sc = choiceValue(form, 'scope')
     return [
       prefixInput
-        ? fieldAnswer('Prefix', `/${ex.prefix}`, prefixInput.value ? `/${prefixInput.value}` : '', checkPrefix(prefixInput.value, ex.prefix), prefixInput, mark)
-        : address('mask', 'Subnetmasker', mask),
-      address('network', 'Netwerkadres', answer.network),
-      address('first', 'Eerste bruikbare adres', answer.firstHost),
-      address('last', 'Laatste bruikbare adres', answer.lastHost),
-      address('broadcast', 'Broadcastadres', answer.broadcast),
-      fieldAnswer('Aantal bruikbare hostadressen', String(answer.hostCount), hostsInput.value, checkInteger(hostsInput.value, answer.hostCount), hostsInput, mark),
-      fieldAnswer('Klasse', answer.ipClass, cls ?? '', checkChoice(cls, answer.ipClass), choiceGroup(form, 'class'), mark),
-      fieldAnswer('Publiek of privaat', scope, sc ?? '', checkChoice(sc, scope), choiceGroup(form, 'scope'), mark),
+        ? fieldAnswer(m.common.prefix, `/${ex.prefix}`, prefixInput.value ? `/${prefixInput.value}` : '', checkPrefix(prefixInput.value, ex.prefix), prefixInput, mark)
+        : address('mask', m.common.subnetMask, mask),
+      address('network', m.common.networkAddress, answer.network),
+      address('first', m.common.firstUsable, answer.firstHost),
+      address('last', m.common.lastUsable, answer.lastHost),
+      address('broadcast', m.common.broadcast, answer.broadcast),
+      fieldAnswer(m.common.usableHosts, String(answer.hostCount), hostsInput.value, checkInteger(hostsInput.value, answer.hostCount), hostsInput, mark),
+      fieldAnswer(m.analysis.class, answer.ipClass, cls ?? '', checkChoice(cls, answer.ipClass), choiceGroup(form, 'class'), mark),
+      fieldAnswer(m.analysis.scope, scopeLabel, scopeLabelOf(sc), checkChoice(sc, scope), choiceGroup(form, 'scope'), mark),
     ]
   }
 
@@ -131,37 +136,33 @@ export const analyzePage: Page = (root) => {
     const answers = evaluate(false)
     const hostBits = 32 - ex.prefix
     const first = toOctets(ex.ip)[0]
+    const [from, to] = CLASS_RANGES[answer.ipClass]
+    const a = m.analysis
     solution.innerHTML = `
-      <h2>Oplossing</h2>
+      <h2>${m.common.solution}</h2>
 
-      <h3>Overzicht</h3>
+      <h3>${m.common.overview}</h3>
       ${overviewHtml(answers)}
 
-      <h3>Binaire uitwerking</h3>
+      <h3>${m.common.binaryWork}</h3>
       ${andTableHtml(
         [
-          { label: 'IP-adres', value: ex.ip },
-          { label: 'Subnetmasker', value: mask },
-          { label: 'Netwerkadres', value: answer.network, ruleAbove: 'AND' },
-          { label: 'Broadcastadres', value: answer.broadcast },
+          { label: m.common.ipAddress, value: ex.ip },
+          { label: m.common.subnetMask, value: mask },
+          { label: m.common.networkAddress, value: answer.network, ruleAbove: 'AND' },
+          { label: m.common.broadcast, value: answer.broadcast },
         ],
         ex.prefix,
       )}
 
       <ol class="steps">
-        <li><strong>Masker:</strong> /${ex.prefix} betekent ${ex.prefix} enen op rij: ${formatIp(mask)}.</li>
-        <li><strong>Netwerkadres</strong> = IP-adres AND subnetmasker: de netwerkbits blijven, alle ${hostBits} hostbits worden 0 → <span class="mono">${formatIp(answer.network)}</span>.</li>
-        <li><strong>Broadcastadres:</strong> dezelfde netwerkbits, alle hostbits op 1 → <span class="mono">${formatIp(answer.broadcast)}</span>.</li>
-        <li><strong>Eerste bruikbare adres</strong> = netwerkadres + 1 → <span class="mono">${formatIp(answer.firstHost)}</span>.<br>
-            <strong>Laatste bruikbare adres</strong> = broadcastadres − 1 → <span class="mono">${formatIp(answer.lastHost)}</span>.</li>
-        <li><strong>Aantal bruikbare hostadressen</strong> = 2<sup>${hostBits}</sup> − 2 = ${formatCount(2 ** hostBits)} − 2 = <strong>${formatCount(answer.hostCount)}</strong>
-            (netwerk- en broadcastadres zijn niet bruikbaar).</li>
-        <li><strong>Klasse:</strong> de eerste byte is ${first}, die ligt tussen ${CLASS_RANGES[answer.ipClass]} → klasse <strong>${answer.ipClass}</strong>.</li>
-        <li><strong>${scope}:</strong> ${
-          answer.isPrivate
-            ? 'het adres ligt in een privébereik (RFC 1918).'
-            : 'het adres ligt niet in een van de privébereiken, dus het is publiek.'
-        } Privébereiken: 10.0.0.0/8, 172.16.0.0/12 en 192.168.0.0/16.</li>
+        <li>${a.stepMask(ex.prefix, formatIp(mask))}</li>
+        <li>${a.stepNetwork(hostBits, formatIp(answer.network))}</li>
+        <li>${a.stepBroadcast(formatIp(answer.broadcast))}</li>
+        <li>${a.stepFirstLast(formatIp(answer.firstHost), formatIp(answer.lastHost))}</li>
+        <li>${a.stepHosts(hostBits, formatCount(2 ** hostBits), formatCount(answer.hostCount))}</li>
+        <li>${a.stepClass(first, from, to, answer.ipClass)}</li>
+        <li>${answer.isPrivate ? a.stepPrivate : a.stepPublic} ${a.privateRanges}</li>
       </ol>`
   }
 

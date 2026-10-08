@@ -1,10 +1,11 @@
 // Keuzeknoppen (radio's als segmenten), groot genoeg om op gsm aan te tikken.
 
-export function choiceHtml(name: string, label: string, options: readonly string[]): string {
+/** Opties als [waarde, label]: de waarde blijft gelijk in elke taal, het label wordt vertaald. */
+export function choiceHtml(name: string, label: string, options: ReadonlyArray<readonly [value: string, label: string]>): string {
   return `
     <div class="choice" role="radiogroup" aria-label="${label}" data-choice="${name}">
       ${options
-        .map((o) => `<label><input type="radio" name="${name}" value="${o}"><span>${o}</span></label>`)
+        .map(([value, text]) => `<label><input type="radio" name="${name}" value="${value}"><span>${text}</span></label>`)
         .join('')}
     </div>`
 }

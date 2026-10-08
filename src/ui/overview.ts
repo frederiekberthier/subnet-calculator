@@ -1,4 +1,5 @@
 // Antwoorden controleren en als overzicht tonen: juist antwoord naast "✓ juist" / "jij: ..." / "niet ingevuld".
+import { t } from '../i18n'
 import { checkDecimalOctet, type FieldResult } from '../lib/check'
 import { escapeHtml } from '../lib/html'
 import { formatIp, toOctets } from '../lib/ipv4'
@@ -62,7 +63,11 @@ export function overviewHtml(answers: Answer[]): string {
           <span class="ov-label">${a.label}</span>
           <span class="ov-correct mono">${a.correct}</span>
           <span class="ov-given">${
-            a.result.status === 'ok' ? '✓ juist' : a.given ? `jij: <span class="mono">${escapeHtml(a.given)}</span>` : 'niet ingevuld'
+            a.result.status === 'ok'
+              ? t().feedback.correct
+              : a.given
+                ? `${t().feedback.you} <span class="mono">${escapeHtml(a.given)}</span>`
+                : t().feedback.notFilled
           }</span>
         </div>`,
         )

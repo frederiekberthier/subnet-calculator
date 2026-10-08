@@ -195,6 +195,43 @@ main:focus {
   outline-color: var(--brand);
 }
 
+/* Taalkeuze NL / EN (zoals op howest.be) */
+.lang-switch {
+  display: flex;
+  gap: 0.15rem;
+  padding: 0.2rem;
+  border: 1px solid rgb(255 255 255 / 0.25);
+  border-radius: 999px;
+}
+
+.lang-switch button {
+  min-width: 44px;
+  min-height: 36px;
+  padding: 0 0.6rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--bar-text);
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.lang-switch button:hover {
+  color: var(--brand);
+}
+
+.lang-switch button[aria-pressed='true'] {
+  background: var(--brand);
+  color: #1c1d1e;
+}
+
+.lang-switch button:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 2px;
+}
+
 .site-header nav a:hover {
   color: var(--brand);
 }
@@ -1294,10 +1331,16 @@ input.is-empty {
   }
 
   .site-header nav {
+    order: 2; /* menu op een eigen rij onder logo en taalkeuze */
     margin: 0 -0.75rem;
     padding: 0 0.25rem;
     width: calc(100% + 1.5rem);
     border-top: 1px solid rgb(255 255 255 / 0.1);
+  }
+
+  .lang-switch {
+    order: 1;
+    margin-left: auto;
   }
 
   .site-header nav a {

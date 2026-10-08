@@ -28,11 +28,6 @@ export type Level = 1 | 2 | 3
 
 export const LEVELS: readonly Level[] = [1, 2, 3]
 
-export const LEVEL_NAMES: Record<Level, string> = {
-  1: 'Basis',
-  2: 'Gevorderd',
-  3: 'Expert',
-}
 
 export type Direction = 'dec2bin' | 'bin2dec'
 
