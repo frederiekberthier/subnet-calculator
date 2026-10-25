@@ -1,5 +1,5 @@
 // Vier invoervakjes voor een adres (decimaal of binair), met automatisch doorspringen.
-import { splitAddressInput } from '../lib/check'
+import { isComplete, splitAddressInput } from '../lib/check'
 
 export type OctetKind = 'dec' | 'bin'
 
@@ -63,7 +63,8 @@ export function wireOctetInputs(root: HTMLElement): void {
       const separated = !binary && SEPARATOR.test(raw)
       const cleaned = raw.replace(binary ? /[^01]/g : /\D/g, '')
       if (cleaned !== raw) input.value = cleaned
-      const full = binary ? cleaned.length === 8 : cleaned.length === 3 || Number(cleaned) * 10 > 255
+      // Byte vol: 8 bits, of decimaal volgens isComplete (0, ≥ 26 of 3 cijfers) — zonder naar het antwoord te kijken.
+      const full = binary ? cleaned.length === 8 : isComplete(cleaned, 255)
       if ((full || (separated && cleaned !== '')) && next && document.activeElement === input) focus(next)
     })
   })

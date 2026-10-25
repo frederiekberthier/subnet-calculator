@@ -6,6 +6,7 @@ import type { Page } from '../router'
 import { andTableHtml } from '../ui/andtable'
 import { choiceGroup, choiceHtml, choiceValue } from '../ui/choice'
 import { clearMarks, focusAfterNew, formatCount, levelSelectHtml, outdatedNoticeHtml, readState, showFeedback, showSolution, wireToolbar } from '../ui/exercise'
+import { wireFormNavigation } from '../ui/navigation'
 import { octetInputs, octetInputsHtml, wireOctetInputs } from '../ui/octets'
 import { addressAnswer, fieldAnswer, overviewHtml, type Answer } from '../ui/overview'
 
@@ -64,7 +65,7 @@ export const analyzePage: Page = (root) => {
         ${
           maskGivenDotted
             ? `<label class="qa-label" for="prefix">${m.common.prefix}</label>
-               <div class="prefix-input"><span>/</span><input id="prefix" inputmode="numeric" maxlength="2" autocomplete="off"></div>`
+               <div class="prefix-input"><span>/</span><input id="prefix" inputmode="numeric" maxlength="3" data-max="32" autocomplete="off"></div>`
             : addressRow('mask', m.common.subnetMask)
         }
         ${addressRow('network', m.common.networkAddress)}
@@ -103,6 +104,7 @@ export const analyzePage: Page = (root) => {
       input.value = input.value.replace(/\D/g, '')
     })
   }
+  wireFormNavigation(form)
   focusAfterNew(prefixInput ?? octetInputs(form, 'mask')[0])
 
   /** Controleer alle velden, markeer ze en geef een overzicht per antwoord terug. */

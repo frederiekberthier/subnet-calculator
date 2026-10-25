@@ -40,6 +40,19 @@ describe('invoervakjes (issues #4 en #11)', () => {
     expect(document.activeElement).toBe(box('a', 2))
   })
 
+  it('een 0 springt door: een byte die met 0 begint kan niets anders meer worden', () => {
+    typeValue(box('a', 0), '0')
+    expect(document.activeElement).toBe(box('a', 1))
+  })
+
+  it('1, 2, 19 en 25 springen niet door: er kan nog een cijfer bij (zonder het antwoord te verklappen)', () => {
+    for (const value of ['1', '2', '19', '25']) {
+      setup()
+      typeValue(box('a', 0), value)
+      expect(document.activeElement, value).toBe(box('a', 0))
+    }
+  })
+
   it('punt, komma of spatie via het input-event springt door (gsm) en wordt weggefilterd', () => {
     typeValue(box('a', 0), '10.')
     expect(box('a', 0).value).toBe('10')

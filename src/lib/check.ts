@@ -65,3 +65,15 @@ export function splitAddressInput(text: string, binary: boolean): string[] {
   const parts = t.split(/[.,\s]+/).filter(Boolean)
   return parts.length > 1 && parts.every((p) => /^\d{1,3}$/.test(p)) ? parts.slice(0, 4) : []
 }
+
+/**
+ * Is een getalvak "vol", zodat de focus naar het volgende veld mag? Kijkt enkel naar wat nog mogelijk
+ * is (nooit naar het juiste antwoord, anders zou het de oplossing verklappen):
+ * - "0": er kan geen cijfer meer bij (een getal begint niet met 0);
+ * - waarde × 10 > max: een extra cijfer zou boven het maximum gaan (bv. byte 26 → 26x > 255);
+ * - het maximale aantal cijfers is bereikt (bv. 3 cijfers voor een byte).
+ */
+export function isComplete(value: string, max: number): boolean {
+  if (!/^\d+$/.test(value)) return false
+  return value === '0' || Number(value) * 10 > max || value.length >= String(max).length
+}

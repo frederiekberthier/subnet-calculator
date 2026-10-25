@@ -5,6 +5,7 @@ import { formatIp, interestingOctet, magicNumber, prefixToMask, subnetAt, toOcte
 import type { Page } from '../router'
 import { andTableHtml } from '../ui/andtable'
 import { clearMarks, focusAfterNew, formatCount as fmt, levelSelectHtml, outdatedNoticeHtml, readState, showFeedback, showSolution, wireToolbar } from '../ui/exercise'
+import { wireFormNavigation } from '../ui/navigation'
 import { octetInputsHtml, wireOctetInputs } from '../ui/octets'
 import { addressAnswer, fieldAnswer, overviewHtml, type Answer } from '../ui/overview'
 
@@ -35,9 +36,10 @@ export const subnetPage: Page = (root) => {
   const hostBits = 32 - plan.newPrefix
   const asked = ex.askIndices.map((i) => ({ index: i, info: subnetAt(plan, i) }))
 
-  const numberRow = (id: string, label: string, prefix = '') => `
+  // max: grootst mogelijke waarde, zodat het vak doorspringt zodra er geen cijfer meer bij kan (zie isComplete).
+  const numberRow = (id: string, label: string, prefix = '', max?: number) => `
     <label class="qa-label" for="${id}">${label}</label>
-    <div class="prefix-input">${prefix ? `<span>${prefix}</span>` : ''}<input id="${id}" class="num-input mono" inputmode="numeric" autocomplete="off"></div>`
+    <div class="prefix-input">${prefix ? `<span>${prefix}</span>` : ''}<input id="${id}" class="num-input mono" inputmode="numeric" ${max ? `data-max="${max}"` : ''} autocomplete="off"></div>`
 
   root.innerHTML = `
     <h1>${s.title}</h1>
@@ -61,10 +63,10 @@ export const subnetPage: Page = (root) => {
     <form class="panel exercise" novalidate>
       <h2 class="form-heading">${s.calculation}</h2>
       <div class="qa qa-2">
-        ${numberRow('borrowed', s.borrowedBits)}
+        ${numberRow('borrowed', s.borrowedBits, '', 22)}
         <div class="qa-label">${s.newMask}</div>
         ${octetInputsHtml('newmask', 'dec', s.newMask)}
-        ${numberRow('newprefix', s.newPrefix, '/')}
+        ${numberRow('newprefix', s.newPrefix, '/', 32)}
         ${numberRow('subnets', s.subnetCount)}
         ${numberRow('hosts', s.hostsPerSubnet)}
       </div>
@@ -106,6 +108,7 @@ export const subnetPage: Page = (root) => {
       el.value = el.value.replace(/\D/g, '')
     })
   }
+  wireFormNavigation(form)
   focusAfterNew(input('borrowed'))
 
   const evaluate = (mark: boolean): Answer[] => {
