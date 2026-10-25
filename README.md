@@ -5,6 +5,9 @@ Studenten krijgen onbeperkt nieuwe opgaves, meteen feedback per veld en een uitg
 
 Online: <https://www.graduaatiot.be/subnetting/>
 
+<img width="2074" height="1391" alt="Schermafbeelding 2026-10-25 181327" src="https://github.com/user-attachments/assets/df7181da-2772-4f14-bb80-c98448d1c1c0" />
+
+
 ## Oefeningen
 
 | # | Oefening | Adres (route) | Wat de student doet |
