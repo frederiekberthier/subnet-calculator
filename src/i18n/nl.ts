@@ -5,7 +5,7 @@ export const nl = {
   site: {
     title: 'Subnetting oefenen',
     description:
-      'Oefen IPv4-subnetting: omrekenen binair ↔ decimaal, adresanalyse en subnetten, met directe feedback en uitgewerkte oplossingen. Graduaat Internet of Things, Howest.',
+      'Oefen IPv4-subnetting en IPv6: omrekenen binair ↔ decimaal, adresanalyse, subnetten en IPv6-adressen verkorten, met directe feedback en uitgewerkte oplossingen. Graduaat Internet of Things, Howest.',
     skip: 'Naar inhoud',
     brandLabel: 'Subnetting oefenen, startpagina',
     brandSub: 'Graduaat IoT',
@@ -15,12 +15,14 @@ export const nl = {
     convert: 'Omrekenen',
     analysis: 'Adresanalyse',
     subnetting: 'Subnetten',
+    ipv6: 'IPv6 verkorten',
   },
   /** Korte namen voor het menu bovenaan (op gsm staan de drie naast elkaar). */
   menu: {
     convert: 'Omrekenen',
     analysis: 'Adresanalyse',
     subnetting: 'Subnetten',
+    ipv6: 'IPv6',
   },
   footer: {
     title: 'Graduaat Internet of Things',
@@ -31,12 +33,13 @@ export const nl = {
   },
   home: {
     eyebrow: 'Graduaat Internet of Things',
-    lead: 'Onbeperkt oefenen op IPv4-adressen en subnetten, met meteen feedback en een uitgewerkte oplossing.',
+    lead: 'Onbeperkt oefenen op IPv4- en IPv6-adressen en subnetten, met meteen feedback en een uitgewerkte oplossing.',
     start: 'Start oefening',
     cards: {
       convert: 'Zet een IPv4-adres en subnetmasker om van decimaal naar binair en omgekeerd.',
       analysis: 'Bepaal netwerkadres, eerste en laatste host, broadcast, klasse en publiek/privaat.',
       subnetting: 'Splits een netwerk in een gevraagd aantal kleinere subnetten.',
+      ipv6: 'Schrijf een volledig IPv6-adres zo kort mogelijk: voorloopnullen weg en één reeks nullen vervangen door ::.',
     },
   },
   notFound: {
@@ -80,6 +83,11 @@ export const nl = {
     eightBits: 'Schrijf elke byte met precies 8 bits (vul aan met nullen vooraan).',
     prefixRange: 'Een prefix is een getal van 0 tot 32, bv. /24.',
     integer: 'Geef een geheel getal.',
+    ipv6Format: 'Schrijf een IPv6-adres als blokken van hoogstens 4 hexadecimale cijfers (0–9, a–f), gescheiden door dubbele punten.',
+    ipv6Once: ':: mag maar één keer in een adres staan: anders weet je niet hoeveel 0-blokken elke :: vervangt.',
+    ipv6LeadingZeros: 'Laat in elk blok de voorloopnullen weg (bv. 0db8 → db8, 0042 → 42, 0000 → 0).',
+    ipv6UseDoubleColon: 'Vervang een reeks opeenvolgende 0-blokken door ::.',
+    ipv6PartialRun: 'Laat :: een volledige reeks 0-blokken vervangen: er staat nog een 0-blok naast de ::.',
   },
   bits: {
     table: 'Binaire uitwerking',
@@ -166,6 +174,25 @@ export const nl = {
       `<strong>Blokgrootte:</strong> in de ${byteName} byte is het nieuwe masker ${maskByte}, dus 256 − ${maskByte} = <strong>${magic}</strong>. Elk volgend subnet begint ${magic} hoger in de ${byteName} byte.`,
     stepPerSubnet:
       '<strong>Per subnet:</strong> eerste bruikbare = netwerkadres + 1, broadcast = volgend netwerkadres − 1, laatste bruikbare = broadcast − 1.',
+  },
+  ipv6: {
+    title: '4. IPv6 verkorten',
+    subtitle: 'voorloopnullen weglaten en ::',
+    lead: 'Schrijf het IPv6-adres zo kort mogelijk. Laat in elk blok de voorloopnullen weg en vervang één reeks opeenvolgende 0-blokken door <strong>::</strong>. Dat mag maar één keer per adres.',
+    given: 'IPv6-adres',
+    answer: 'Verkort adres',
+    blocks: 'Blokken',
+    colBlock: 'Blok',
+    colFull: 'Volledig',
+    colShort: 'Zonder voorloopnullen',
+    zeroRun: 'reeks 0-blokken',
+    step1: (text: string) =>
+      `<strong>Regel 1 – voorloopnullen weglaten:</strong> in elk blok vallen de nullen vooraan weg (0000 wordt 0) → <span class="mono">${text}</span>.`,
+    step2: (text: string, length: number, from: number) =>
+      `<strong>Regel 2 – één reeks 0-blokken door :: vervangen:</strong> de langste reeks is ${length} ${length === 1 ? 'blok' : 'blokken'} vanaf blok ${from} → <span class="mono">${text}</span>.`,
+    alternatives: (list: string) =>
+      `Ook juist: ${list}. Je mag kiezen welke reeks nullen je door :: vervangt, maar :: mag maar één keer voorkomen.`,
+    once: 'Waarom maar één keer? Bij twee keer :: weet je niet meer hoeveel 0-blokken elke :: voorstelt.',
   },
 }
 

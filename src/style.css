@@ -285,8 +285,21 @@ main {
 
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  /* 4 oefeningen: 4 naast elkaar, 2 x 2 op tablet, 1 per rij op gsm (nooit 3 + 1). */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1.25rem;
+}
+
+@media (max-width: 960px) {
+  .cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .card {
@@ -975,6 +988,91 @@ input.is-empty {
   font-size: 0.85rem;
 }
 
+/* ---------- Oefening 4: IPv6 verkorten ---------- */
+
+.ipv6-given {
+  font-size: 1.35rem;
+  overflow-wrap: anywhere;
+}
+
+.ipv6-input {
+  width: 100%;
+  max-width: 34rem;
+  padding: 0 0.75rem;
+  font-size: 1.1rem;
+}
+
+.v6-groups {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+
+.v6-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.5rem 0.25rem;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.v6-group.v6-zero {
+  background: var(--host-off);
+}
+
+.v6-group.v6-run {
+  border-color: var(--link);
+}
+
+.v6-nr {
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.v6-full {
+  font-weight: 700;
+}
+
+.v6-lz {
+  color: var(--muted);
+  font-weight: 400;
+  text-decoration: line-through;
+}
+
+.v6-arrow {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.v6-short {
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--heading);
+}
+
+.bs-split .bs-key.v6-key-zero {
+  background: var(--host-on);
+}
+
+.bs-split .bs-key.v6-key-run {
+  margin-left: 0.75rem;
+  background: var(--link);
+}
+
+@media (max-width: 720px) {
+  .v6-groups {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 /* Bitstrook: 4 bytes naast elkaar met gewichten, bits, decimaal en som. */
 
 .bitstrip {
@@ -1300,7 +1398,13 @@ input.is-empty {
   }
 
   .ov-row {
-    grid-template-columns: minmax(0, 1fr) auto;
+    /* Beide kolommen mogen krimpen en overal afbreken: een IPv6-adres heeft geen spaties. */
+    grid-template-columns: minmax(0, 1fr) minmax(0, max-content);
+  }
+
+  .ov-correct,
+  .ov-given {
+    overflow-wrap: break-word;
   }
 
   .ov-label {

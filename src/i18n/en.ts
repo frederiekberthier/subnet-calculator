@@ -5,7 +5,7 @@ export const en: Messages = {
   site: {
     title: 'Subnetting practice',
     description:
-      'Practise IPv4 subnetting: binary ↔ decimal conversion, address analysis and subnetting, with instant feedback and detailed solutions. Associate degree Internet of Things, Howest.',
+      'Practise IPv4 subnetting and IPv6: binary ↔ decimal conversion, address analysis, subnetting and shortening IPv6 addresses, with instant feedback and detailed solutions. Associate degree Internet of Things, Howest.',
     skip: 'Skip to content',
     brandLabel: 'Subnetting practice, home page',
     brandSub: 'Howest IoT',
@@ -15,11 +15,13 @@ export const en: Messages = {
     convert: 'Conversion',
     analysis: 'Address analysis',
     subnetting: 'Subnetting',
+    ipv6: 'Shortening IPv6',
   },
   menu: {
     convert: 'Conversion',
     analysis: 'Analysis',
     subnetting: 'Subnetting',
+    ipv6: 'IPv6',
   },
   footer: {
     title: 'Associate degree Internet of Things',
@@ -30,12 +32,13 @@ export const en: Messages = {
   },
   home: {
     eyebrow: 'Associate degree Internet of Things',
-    lead: 'Unlimited practice with IPv4 addresses and subnets, with instant feedback and a detailed solution.',
+    lead: 'Unlimited practice with IPv4 and IPv6 addresses and subnets, with instant feedback and a detailed solution.',
     start: 'Start exercise',
     cards: {
       convert: 'Convert an IPv4 address and subnet mask from decimal to binary and back.',
       analysis: 'Find the network address, first and last host, broadcast, class and public/private.',
       subnetting: 'Split a network into a requested number of smaller subnets.',
+      ipv6: 'Write a full IPv6 address as short as possible: drop leading zeros and replace one run of zeros with ::.',
     },
   },
   notFound: {
@@ -79,6 +82,11 @@ export const en: Messages = {
     eightBits: 'Write every byte with exactly 8 bits (pad with leading zeros).',
     prefixRange: 'A prefix is a number from 0 to 32, e.g. /24.',
     integer: 'Enter a whole number.',
+    ipv6Format: 'Write an IPv6 address as groups of at most 4 hexadecimal digits (0–9, a–f), separated by colons.',
+    ipv6Once: ':: may appear only once in an address: otherwise you cannot tell how many zero groups each :: stands for.',
+    ipv6LeadingZeros: 'Drop the leading zeros in every group (e.g. 0db8 → db8, 0042 → 42, 0000 → 0).',
+    ipv6UseDoubleColon: 'Replace a run of consecutive zero groups with ::.',
+    ipv6PartialRun: 'Let :: replace a complete run of zero groups: there is still a zero group next to the ::.',
   },
   bits: {
     table: 'Binary working',
@@ -161,5 +169,24 @@ export const en: Messages = {
       `<strong>Block size:</strong> in the ${byteName} byte the new mask is ${maskByte}, so 256 − ${maskByte} = <strong>${magic}</strong>. Each next subnet starts ${magic} higher in the ${byteName} byte.`,
     stepPerSubnet:
       '<strong>Per subnet:</strong> first host = network address + 1, broadcast = next network address − 1, last host = broadcast − 1.',
+  },
+  ipv6: {
+    title: '4. Shortening IPv6',
+    subtitle: 'dropping leading zeros and ::',
+    lead: 'Write the IPv6 address as short as possible. Drop the leading zeros in every group and replace one run of consecutive zero groups with <strong>::</strong>. You may do that only once per address.',
+    given: 'IPv6 address',
+    answer: 'Shortened address',
+    blocks: 'Groups',
+    colBlock: 'Group',
+    colFull: 'Full',
+    colShort: 'Without leading zeros',
+    zeroRun: 'run of zero groups',
+    step1: (text: string) =>
+      `<strong>Rule 1 – drop leading zeros:</strong> in every group the zeros at the front disappear (0000 becomes 0) → <span class="mono">${text}</span>.`,
+    step2: (text: string, length: number, from: number) =>
+      `<strong>Rule 2 – replace one run of zero groups with ::</strong> – the longest run is ${length} ${length === 1 ? 'group' : 'groups'} starting at group ${from} → <span class="mono">${text}</span>.`,
+    alternatives: (list: string) =>
+      `Also correct: ${list}. You may choose which run of zeros you replace with ::, but :: may appear only once.`,
+    once: 'Why only once? With :: twice you can no longer tell how many zero groups each :: stands for.',
   },
 }
