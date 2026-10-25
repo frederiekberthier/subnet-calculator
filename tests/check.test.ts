@@ -5,6 +5,7 @@ import {
   checkDecimalOctet,
   checkInteger,
   checkPrefix,
+  isComplete,
   splitAddressInput,
 } from '../src/lib/check'
 
@@ -80,5 +81,29 @@ describe('splitAddressInput (plakken, issue #11)', () => {
     expect(splitAddressInput('10101000', true)).toEqual([])
     expect(splitAddressInput('<b>1.2.3.4</b>', false)).toEqual([])
     expect(splitAddressInput('1.2.3.x', false)).toEqual([])
+  })
+})
+
+describe('isComplete: wanneer springt de focus door (gebruiksgemak)', () => {
+  const complete = (max: number, values: string[]) => values.map((v) => isComplete(v, max))
+
+  it('byte (max 255): 0, 26 en hoger, of 3 cijfers', () => {
+    expect(complete(255, ['0', '26', '99', '168', '255', '100'])).toEqual([true, true, true, true, true, true])
+    // 1, 2, 10, 19 en 25 kunnen nog langer worden (bv. 19 → 192): niet doorspringen
+    expect(complete(255, ['1', '2', '10', '19', '25'])).toEqual([false, false, false, false, false])
+  })
+
+  it('prefix (max 32): 0, 4-9 of 2 cijfers', () => {
+    expect(complete(32, ['0', '4', '9', '24', '30', '10'])).toEqual([true, true, true, true, true, true])
+    expect(complete(32, ['1', '2', '3'])).toEqual([false, false, false])
+  })
+
+  it('geleende bits (max 22): 3-9 of 2 cijfers', () => {
+    expect(complete(22, ['3', '9', '10', '22'])).toEqual([true, true, true, true])
+    expect(complete(22, ['1', '2'])).toEqual([false, false])
+  })
+
+  it('leeg of geen getal is nooit vol', () => {
+    expect(complete(255, ['', 'a', '1.'])).toEqual([false, false, false])
   })
 })

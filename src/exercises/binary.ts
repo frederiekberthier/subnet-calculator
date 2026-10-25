@@ -5,6 +5,7 @@ import { formatBinary, formatIp, prefixToMask, toOctets } from '../lib/ipv4'
 import type { Page } from '../router'
 import { bitStripHtml } from '../ui/bitstrip'
 import { clearMarks, focusAfterNew, levelSelectHtml, outdatedNoticeHtml, markField, readState, showFeedback, showSolution, wireToolbar } from '../ui/exercise'
+import { wireFormNavigation } from '../ui/navigation'
 import { octetInputs, octetInputsHtml, octetValues, wireOctetInputs } from '../ui/octets'
 
 const PATH = '/omrekenen'
@@ -54,7 +55,7 @@ export const binaryPage: Page = (root) => {
 
         <label class="qa-label" for="prefix">${m.common.prefix}</label>
         <div class="given muted">${m.convert.prefixHint}</div>
-        <div class="prefix-input"><span>/</span><input id="prefix" inputmode="numeric" maxlength="3" autocomplete="off"></div>
+        <div class="prefix-input"><span>/</span><input id="prefix" inputmode="numeric" maxlength="3" data-max="32" autocomplete="off"></div>
       </div>
 
       <div class="actions">
@@ -75,6 +76,7 @@ export const binaryPage: Page = (root) => {
   prefixInput.addEventListener('input', () => {
     prefixInput.value = prefixInput.value.replace(/\D/g, '')
   })
+  wireFormNavigation(form)
   focusAfterNew(octetInputs(form, 'ip')[0])
 
   const checkOctet = toBinary ? checkBinaryOctet : checkDecimalOctet
