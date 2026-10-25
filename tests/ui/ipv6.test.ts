@@ -74,4 +74,30 @@ describe('oefening 4: IPv6 verkorten', () => {
     expect(solution.textContent).toContain('Ook juist')
     expect(solution.innerHTML).toContain('&lt;b&gt;x&lt;/b&gt;')
   })
+
+  it('regel 1 vermeldt de voorloopnullen expliciet: per blok gemarkeerd, geteld en opgesomd', () => {
+    const ex = render(1, 1) // 2001:0db8:... (niveau 1 begint altijd met de documentatieprefix)
+    root.querySelector<HTMLElement>('[data-action="solution"]')!.click()
+    const solution = root.querySelector('.solution')!
+    const cards = [...solution.querySelectorAll('.v6-group')]
+    expect(cards).toHaveLength(8)
+    // blok 2 = 0db8: één voorloopnul, gemarkeerd en geteld
+    expect(cards[1].querySelector('.v6-lz')!.textContent).toBe('0')
+    expect(cards[1].querySelector('.v6-removed')!.textContent).toBe('−1 nul')
+    expect(cards[1].classList.contains('v6-changed')).toBe(true)
+    // blok 1 = 2001: geen voorloopnullen
+    expect(cards[0].querySelector('.v6-lz')).toBeNull()
+    expect(cards[0].querySelector('.v6-removed')!.textContent).toBe('geen')
+    // opsomming van de aangepaste blokken en het resultaat van regel 1
+    const text = solution.textContent!.replace(/\s+/g, ' ')
+    expect(text).toContain('Aangepaste blokken: 0db8 → db8')
+    expect(text).toContain('0000 → 0')
+    expect(text).toContain('ongewijzigd: 2001')
+    expect(text).toContain(`Na regel 1: ${ex.groups.map((g) => g.toString(16)).join(':')}`)
+    // elk blok met voorloopnullen telt het juiste aantal weggevallen nullen
+    ex.groups.forEach((g, i) => {
+      const zeros = 4 - g.toString(16).length
+      expect(cards[i].querySelector('.v6-lz')?.textContent ?? '', `blok ${i + 1}`).toBe('0'.repeat(zeros))
+    })
+  })
 })

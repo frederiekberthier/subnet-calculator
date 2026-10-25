@@ -181,15 +181,21 @@ export const nl = {
     lead: 'Schrijf het IPv6-adres zo kort mogelijk. Laat in elk blok de voorloopnullen weg en vervang één reeks opeenvolgende 0-blokken door <strong>::</strong>. Dat mag maar één keer per adres.',
     given: 'IPv6-adres',
     answer: 'Verkort adres',
-    blocks: 'Blokken',
     colBlock: 'Blok',
-    colFull: 'Volledig',
-    colShort: 'Zonder voorloopnullen',
+    rule1Title: 'Regel 1 – voorloopnullen weglaten',
+    rule1Intro:
+      'In elk blok vallen de nullen <strong>vooraan</strong> weg: ze veranderen de waarde niet (0042 = 42). Nullen achteraan of in het midden blijven staan (ff00, 0a0b → a0b). Van een blok met enkel nullen blijft één 0 over (0000 → 0).',
+    removed: (n: number) => (n === 0 ? 'geen' : `−${n} ${n === 1 ? 'nul' : 'nullen'}`),
+    changed: (list: string) => `Aangepaste blokken: ${list}.`,
+    unchanged: (list: string) => `Geen voorloopnullen, dus ongewijzigd: ${list}.`,
+    result1: (text: string) => `Na regel 1: <span class="mono">${text}</span>`,
+    rule2Title: 'Regel 2 – één reeks 0-blokken door :: vervangen',
+    rule2Intro:
+      'Zoek de reeksen opeenvolgende 0-blokken in het adres van regel 1. Eén reeks mag je vervangen door <strong>::</strong> (de langste reeks geeft het kortste adres).',
+    rule2Chosen: (length: number, from: number, text: string) =>
+      `De langste reeks is ${length} ${length === 1 ? 'blok' : 'blokken'} vanaf blok ${from} → <span class="mono">${text}</span>`,
+    leadingZeros: 'voorloopnullen',
     zeroRun: 'reeks 0-blokken',
-    step1: (text: string) =>
-      `<strong>Regel 1 – voorloopnullen weglaten:</strong> in elk blok vallen de nullen vooraan weg (0000 wordt 0) → <span class="mono">${text}</span>.`,
-    step2: (text: string, length: number, from: number) =>
-      `<strong>Regel 2 – één reeks 0-blokken door :: vervangen:</strong> de langste reeks is ${length} ${length === 1 ? 'blok' : 'blokken'} vanaf blok ${from} → <span class="mono">${text}</span>.`,
     alternatives: (list: string) =>
       `Ook juist: ${list}. Je mag kiezen welke reeks nullen je door :: vervangt, maar :: mag maar één keer voorkomen.`,
     once: 'Waarom maar één keer? Bij twee keer :: weet je niet meer hoeveel 0-blokken elke :: voorstelt.',

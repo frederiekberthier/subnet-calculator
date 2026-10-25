@@ -176,15 +176,21 @@ export const en: Messages = {
     lead: 'Write the IPv6 address as short as possible. Drop the leading zeros in every group and replace one run of consecutive zero groups with <strong>::</strong>. You may do that only once per address.',
     given: 'IPv6 address',
     answer: 'Shortened address',
-    blocks: 'Groups',
     colBlock: 'Group',
-    colFull: 'Full',
-    colShort: 'Without leading zeros',
+    rule1Title: 'Rule 1 – drop leading zeros',
+    rule1Intro:
+      'In every group the zeros <strong>at the front</strong> disappear: they do not change the value (0042 = 42). Zeros at the end or in the middle stay (ff00, 0a0b → a0b). A group of only zeros keeps one 0 (0000 → 0).',
+    removed: (n: number) => (n === 0 ? 'none' : `−${n} ${n === 1 ? 'zero' : 'zeros'}`),
+    changed: (list: string) => `Changed groups: ${list}.`,
+    unchanged: (list: string) => `No leading zeros, so unchanged: ${list}.`,
+    result1: (text: string) => `After rule 1: <span class="mono">${text}</span>`,
+    rule2Title: 'Rule 2 – replace one run of zero groups with ::',
+    rule2Intro:
+      'Look for the runs of consecutive zero groups in the address from rule 1. You may replace one run with <strong>::</strong> (the longest run gives the shortest address).',
+    rule2Chosen: (length: number, from: number, text: string) =>
+      `The longest run is ${length} ${length === 1 ? 'group' : 'groups'} starting at group ${from} → <span class="mono">${text}</span>`,
+    leadingZeros: 'leading zeros',
     zeroRun: 'run of zero groups',
-    step1: (text: string) =>
-      `<strong>Rule 1 – drop leading zeros:</strong> in every group the zeros at the front disappear (0000 becomes 0) → <span class="mono">${text}</span>.`,
-    step2: (text: string, length: number, from: number) =>
-      `<strong>Rule 2 – replace one run of zero groups with ::</strong> – the longest run is ${length} ${length === 1 ? 'group' : 'groups'} starting at group ${from} → <span class="mono">${text}</span>.`,
     alternatives: (list: string) =>
       `Also correct: ${list}. You may choose which run of zeros you replace with ::, but :: may appear only once.`,
     once: 'Why only once? With :: twice you can no longer tell how many zero groups each :: stands for.',

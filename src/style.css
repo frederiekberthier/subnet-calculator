@@ -1019,12 +1019,9 @@ input.is-empty {
   background: var(--surface);
 }
 
-.v6-group.v6-zero {
-  background: var(--host-off);
-}
-
-.v6-group.v6-run {
-  border-color: var(--link);
+.v6-group.v6-changed {
+  border-color: var(--sub-on);
+  background: var(--sub-off);
 }
 
 .v6-nr {
@@ -1036,10 +1033,13 @@ input.is-empty {
   font-weight: 700;
 }
 
+/* Voorloopnullen: gele markering + doorstreept, zodat regel 1 meteen opvalt. */
 .v6-lz {
-  color: var(--muted);
-  font-weight: 400;
-  text-decoration: line-through;
+  padding: 0 0.1rem;
+  border-radius: 3px;
+  background: var(--sub-on);
+  color: #1c1d1e;
+  text-decoration-thickness: 2px;
 }
 
 .v6-arrow {
@@ -1056,6 +1056,72 @@ input.is-empty {
   font-weight: 800;
   font-size: 1.05rem;
   color: var(--heading);
+}
+
+.v6-removed {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--heading);
+}
+
+.v6-removed.muted {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.v6-rule {
+  margin-top: 1.5rem;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.v6-list {
+  margin: 0.75rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.v6-result {
+  margin: 0.75rem 0 0;
+  font-weight: 600;
+}
+
+/* Regel 2: adres na regel 1 als reeks blokken; 0-blokken roze, gekozen reeks omkaderd. */
+.v6-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem;
+  margin: 0.75rem 0 0;
+}
+
+.v6-chip {
+  padding: 0.3rem 0.5rem;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  font-weight: 800;
+  color: var(--heading);
+}
+
+.v6-chip.v6-zero {
+  background: var(--host-off);
+}
+
+.v6-chip.v6-run {
+  border-color: var(--link);
+}
+
+.v6-colon {
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.bs-split .bs-key.v6-key-lz {
+  background: var(--sub-on);
 }
 
 .bs-split .bs-key.v6-key-zero {
