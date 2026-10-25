@@ -6,6 +6,7 @@ import { homePage, notFoundPage } from './pages/home'
 import { binaryPage } from './exercises/binary'
 import { analyzePage } from './exercises/analyze'
 import { subnetPage } from './exercises/subnet'
+import { ipv6Page } from './exercises/ipv6'
 
 document.querySelector('#year')!.textContent = String(new Date().getFullYear())
 
@@ -19,6 +20,7 @@ const router = startRouter(
     '/omrekenen': binaryPage,
     '/analyse': analyzePage,
     '/subnetten': subnetPage,
+    '/ipv6': ipv6Page,
   },
   notFoundPage,
 )

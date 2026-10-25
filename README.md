@@ -9,6 +9,7 @@ Online: <https://www.graduaatiot.be/subnetting/>
 1. **Omrekenen** (binair ↔ decimaal) – IP-adres en subnetmasker omzetten in beide richtingen, plus de prefix.
 2. **Adresanalyse** – netwerkadres, eerste/laatste bruikbare adres, broadcast, aantal bruikbare hostadressen, klasse, publiek/privaat en het masker in de andere notatie.
 3. **Subnetten** – een netwerk splitsen in minstens N even grote subnetten: geleende bits, nieuw masker, aantal subnetten, hosts per subnet en 4 subnetten volledig uitschrijven.
+4. **IPv6 inkorten** – een volledig uitgeschreven IPv6-adres zo ver mogelijk inkorten: voorloopnullen schrappen en één rij lege groepen (enkel nullen) weglaten met `::` (zero compression).
 
 Elke oefening heeft drie niveaus: **Basis**, **Gevorderd** en **Expert**. Bij omrekenen en adresanalyse gebruikt Basis de standaardprefix van de klasse, Gevorderd /24–/30 en Expert elke toegelaten prefix. Bij subnetten start Basis van een /24 (tot 8 netwerken), Gevorderd van een /16 of /24 (tot 32) en Expert van elke toegelaten prefix tot /26 (tot 64).
 
@@ -26,6 +27,7 @@ Deze regels zitten in de rekenkern (`src/lib/ipv4.ts`) en worden door tests bewa
 - **Nooit supernetting**: de prefix is nooit korter dan de standaardprefix van de klasse (A /8, B /16, C /24) – zie `isSubnettingAllowed`.
 - Bij n geleende bits zijn er **2ⁿ subnetten**, genummerd vanaf **subnet 1** (het eerste subnet, vroeger ook "subnet zero" genoemd, is bruikbaar).
 - **Subnetten enkel op private adressen**: het startnetwerk van oefening 3 ligt altijd in 10.0.0.0/8 (klasse A), 172.16.0.0/12 (B) of 192.168.0.0/16 (C), en daardoor ook alle subnetten. Omrekenen en adresanalyse gebruiken zowel publieke als private adressen (bij adresanalyse moet de student dat net bepalen).
+- **IPv6 inkorten**: een antwoord is juist als het hetzelfde adres is, alle voorloopnullen geschrapt zijn en `::` precies één keer een **volledige** rij lege groepen weglaat. Welke rij maakt niet uit, ook één enkele lege groep mag; hoofd- en kleine letters zijn toegelaten. De oplossing volgt de schrijfwijze van de opgave en toont de kortste vorm (langste rij) en de andere juiste schrijfwijzen. Het taalgebruik (groep/hextet, voorloopnullen schrappen, lege groepen weglaten, zero compression) volgt de lesdia's.
 - Het gegeven IP-adres of startnetwerk ligt nooit in een speciaal bereik (0.x, 127.x, 169.254.x, 100.64.0.0/10, documentatiebereiken, klasse D/E).
 
 ## Opgave delen

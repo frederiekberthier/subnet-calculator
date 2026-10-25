@@ -3,6 +3,7 @@ import {
   GENERATOR_VERSION,
   generateAnalyze,
   generateBinary,
+  generateIpv6,
   generateSubnet,
   isSpecial,
   LEVELS,
@@ -18,6 +19,7 @@ import {
   networkAddress,
   subnetAt,
 } from '../src/lib/ipv4'
+import { checkShortened, formatFull, shortest, validShortenings, zeroRuns } from '../src/lib/ipv6'
 import { createRng, parseSeed } from '../src/lib/random'
 
 const RUNS = 2000
@@ -260,4 +262,67 @@ describe('oefening 3: enkel private netwerken', () => {
       }
     })
   }
+})
+
+describe('oefening 4: IPv6 verkorten', () => {
+  for (const level of LEVELS) {
+    it(`niveau ${level}: elke opgave oefent beide regels en heeft een juist antwoord`, () => {
+      const rng = createRng(6600 + level)
+      for (let i = 0; i < 5000; i++) {
+        const { groups } = generateIpv6(rng, level)
+        const label = formatFull(groups)
+        expect(groups, label).toHaveLength(8)
+        expect(groups.every((g) => Number.isInteger(g) && g >= 0 && g <= 0xffff), label).toBe(true)
+        expect(groups.includes(0), `${label}: minstens één 0-blok (regel 2)`).toBe(true)
+        expect(groups.some((g) => g !== 0), `${label}: niet het volledige 0-adres`).toBe(true)
+        expect(groups.some((g) => g !== 0 && g < 0x1000), `${label}: minstens één voorloopnul (regel 1)`).toBe(true)
+        expect(checkShortened(shortest(groups), groups).status, label).toBe('ok')
+        for (const alt of validShortenings(groups)) expect(checkShortened(alt, groups).status, `${label} → ${alt}`).toBe('ok')
+      }
+    })
+  }
+
+  it('niveau 1 heeft één reeks van 2-4 nullen en de documentatieprefix', () => {
+    const rng = createRng(61)
+    for (let i = 0; i < 2000; i++) {
+      const { groups } = generateIpv6(rng, 1)
+      const runs = zeroRuns(groups)
+      expect(runs).toHaveLength(1)
+      expect(runs[0].length).toBeGreaterThanOrEqual(2)
+      expect(groups.slice(0, 2)).toEqual([0x2001, 0xdb8])
+    }
+  })
+
+  it('niveau 2 heeft twee reeksen nullen', () => {
+    const rng = createRng(62)
+    for (let i = 0; i < 2000; i++) expect(zeroRuns(generateIpv6(rng, 2).groups)).toHaveLength(2)
+  })
+
+  it('niveau 3 bevat de lastige gevallen: nullen vooraan, achteraan, even lange reeksen, losse 0-blokken, hoofdletters', () => {
+    const rng = createRng(63)
+    const seen = { start: false, end: false, tie: false, single: false, upper: false }
+    for (let i = 0; i < 3000; i++) {
+      const { groups, upper } = generateIpv6(rng, 3)
+      const runs = zeroRuns(groups)
+      if (groups[0] === 0) seen.start = true
+      if (groups[7] === 0) seen.end = true
+      if (runs.length > 1 && runs.filter((r) => r.length === Math.max(...runs.map((x) => x.length))).length > 1) seen.tie = true
+      if (runs.every((r) => r.length === 1)) seen.single = true
+      if (upper) seen.upper = true
+    }
+    expect(seen).toEqual({ start: true, end: true, tie: true, single: true, upper: true })
+  })
+})
+
+// Vaste IPv6-opgaves per seed (aparte snapshot: de bestaande opgaves van oefening 1-3 blijven ongewijzigd).
+describe('vaste IPv6-opgaves per seed', () => {
+  it(`generatorversie ${GENERATOR_VERSION} (IPv6)`, () => {
+    const out = LEVELS.flatMap((level) =>
+      [1, 2, 3, 4, 5].map((seed) => {
+        const ex = generateIpv6(createRng(seed), level)
+        return `n${level} s${seed}: ${formatFull(ex.groups, ex.upper)}`
+      }),
+    )
+    expect(out).toMatchSnapshot()
+  })
 })

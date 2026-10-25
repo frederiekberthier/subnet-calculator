@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { analyzePage } from '../../src/exercises/analyze'
 import { binaryPage } from '../../src/exercises/binary'
 import { subnetPage } from '../../src/exercises/subnet'
+import { ipv6Page } from '../../src/exercises/ipv6'
 import { applyStaticTexts, getLang, initLang, setLang } from '../../src/i18n'
 import { en } from '../../src/i18n/en'
 import { nl } from '../../src/i18n/nl'
@@ -32,8 +33,8 @@ function renderAll(page: Page, hash: string): HTMLElement {
   const form = root.querySelector('form')
   if (form) {
     // één vakje met een formaatfout, zodat ook een tip verschijnt
-    const box = root.querySelector<HTMLInputElement>('input.octet')
-    if (box) box.value = '999'
+    const box = root.querySelector<HTMLInputElement>('input.octet, #ipv6')
+    if (box) box.value = box.id === 'ipv6' ? '2001:0db8::1' : '999'
     form.dispatchEvent(new Event('submit', { cancelable: true }))
     root.querySelector<HTMLElement>('[data-action="solution"]')!.click()
     root.querySelector('details')?.setAttribute('open', '')
@@ -48,6 +49,7 @@ const PAGES: Array<[string, Page, string]> = [
   ['omrekenen bin→dec', binaryPage, '#/omrekenen?seed=3&niveau=2&richting=bin2dec'],
   ['adresanalyse', analyzePage, '#/analyse?seed=3&niveau=3'],
   ['subnetten', subnetPage, '#/subnetten?seed=3&niveau=3'],
+  ['IPv6 verkorten', ipv6Page, '#/ipv6?seed=3&niveau=3'],
 ]
 
 beforeEach(() => {

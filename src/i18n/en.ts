@@ -5,7 +5,7 @@ export const en: Messages = {
   site: {
     title: 'Subnetting practice',
     description:
-      'Practise IPv4 subnetting: binary ↔ decimal conversion, address analysis and subnetting, with instant feedback and detailed solutions. Associate degree Internet of Things, Howest.',
+      'Practise IPv4 subnetting and IPv6: binary ↔ decimal conversion, address analysis, subnetting and shortening IPv6 addresses, with instant feedback and detailed solutions. Associate degree Internet of Things, Howest.',
     skip: 'Skip to content',
     brandLabel: 'Subnetting practice, home page',
     brandSub: 'Howest IoT',
@@ -15,11 +15,13 @@ export const en: Messages = {
     convert: 'Conversion',
     analysis: 'Address analysis',
     subnetting: 'Subnetting',
+    ipv6: 'Shortening IPv6',
   },
   menu: {
     convert: 'Conversion',
     analysis: 'Analysis',
     subnetting: 'Subnetting',
+    ipv6: 'IPv6',
   },
   footer: {
     title: 'Associate degree Internet of Things',
@@ -30,12 +32,13 @@ export const en: Messages = {
   },
   home: {
     eyebrow: 'Associate degree Internet of Things',
-    lead: 'Unlimited practice with IPv4 addresses and subnets, with instant feedback and a detailed solution.',
+    lead: 'Unlimited practice with IPv4 and IPv6 addresses and subnets, with instant feedback and a detailed solution.',
     start: 'Start exercise',
     cards: {
       convert: 'Convert an IPv4 address and subnet mask from decimal to binary and back.',
       analysis: 'Find the network address, first and last host, broadcast, class and public/private.',
       subnetting: 'Split a network into a requested number of smaller subnets.',
+      ipv6: 'Shorten a full IPv6 address: remove the leading zeros and omit one run of all-zero groups (::).',
     },
   },
   notFound: {
@@ -79,6 +82,11 @@ export const en: Messages = {
     eightBits: 'Write every byte with exactly 8 bits (pad with leading zeros).',
     prefixRange: 'A prefix is a number from 0 to 32, e.g. /24.',
     integer: 'Enter a whole number.',
+    ipv6Format: 'Write an IPv6 address as groups of at most 4 hexadecimal digits (0–9, A–F), separated by a colon.',
+    ipv6Once: 'Zero compression (::) may be applied only once: otherwise you cannot tell how many all-zero groups each :: stands for.',
+    ipv6LeadingZeros: 'Remove the leading zeros in every group (e.g. 0DB8 → DB8, 0370 → 370, 0000 → 0).',
+    ipv6UseDoubleColon: 'Omit a run of consecutive all-zero groups and replace it with ::.',
+    ipv6PartialRun: 'Use :: to omit the complete run of all-zero groups: there is still an all-zero group next to the ::.',
   },
   bits: {
     table: 'Binary working',
@@ -161,5 +169,30 @@ export const en: Messages = {
       `<strong>Block size:</strong> in the ${byteName} byte the new mask is ${maskByte}, so 256 − ${maskByte} = <strong>${magic}</strong>. Each next subnet starts ${magic} higher in the ${byteName} byte.`,
     stepPerSubnet:
       '<strong>Per subnet:</strong> first host = network address + 1, broadcast = next network address − 1, last host = broadcast − 1.',
+  },
+  ipv6: {
+    title: '4. Shortening IPv6',
+    subtitle: 'removing leading zeros and omitting all-zero groups',
+    lead: 'Shorten the IPv6 address as far as possible. Remove the leading zeros in every group and omit one run of consecutive groups that contain only zeros: replace them with a double colon <strong>::</strong>. You may apply this zero compression only once.',
+    given: 'IPv6 address',
+    answer: 'Shortened address',
+    colBlock: 'Group',
+    rule1Title: 'Rule 1 – remove leading zeros',
+    rule1Intro:
+      'Zeros at the <strong>start</strong> of a group (hextet) may be removed: they do not change the value (0370 = 370). Zeros at the end or in the middle stay (FF00, 0A0B → A0B). A group of only zeros keeps one 0 (0000 → 0).',
+    removed: (n: number) => (n === 0 ? 'none' : `−${n} ${n === 1 ? 'zero' : 'zeros'}`),
+    changed: (list: string) => `Changed groups: ${list}.`,
+    unchanged: (list: string) => `No leading zeros, so unchanged: ${list}.`,
+    result1: (text: string) => `After rule 1: <span class="mono">${text}</span>`,
+    rule2Title: 'Rule 2 – omit all-zero groups (zero compression)',
+    rule2Intro:
+      'In the address from rule 1, look for the runs of consecutive groups that contain only zeros. You may omit one run and replace it with a double colon <strong>::</strong> (the longest run gives the shortest address).',
+    rule2Chosen: (length: number, from: number, text: string) =>
+      `The longest run is ${length} ${length === 1 ? 'group' : 'groups'} starting at group ${from} → <span class="mono">${text}</span>`,
+    leadingZeros: 'leading zeros',
+    zeroRun: 'run of all-zero groups',
+    alternatives: (list: string) =>
+      `Also correct: ${list}. You may choose which run of all-zero groups you omit, but zero compression may be applied only once.`,
+    once: 'Why only once? With :: twice you can no longer tell how many all-zero groups each :: stands for: FD00::B13A:831::6789 is wrong, FD00::B13A:831:0:6789 is correct.',
   },
 }

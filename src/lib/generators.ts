@@ -13,6 +13,7 @@ import {
   type NetworkInfo,
   type SubnetPlan,
 } from './ipv4'
+import type { Groups } from './ipv6'
 import type { Rng } from './random'
 
 /**
@@ -181,4 +182,93 @@ export function generateSubnet(rng: Rng, level: Level): SubnetExercise {
   const askIndices = chooseIndices(rng, plan.subnetCount)
   const maskNotation = level === 1 || rng.chance(0.5) ? 'dotted' : 'cidr'
   return { network, prefix, requested, plan, askIndices, maskNotation }
+}
+
+// ---------------------------------------------------------------------------
+// Oefening 4: IPv6 verkorten
+
+export interface Ipv6Exercise {
+  /** De 8 blokken van het adres. */
+  groups: Groups
+  /** Opgave in hoofdletters tonen (enkel op niveau Expert, om te tonen dat het niet uitmaakt). */
+  upper: boolean
+}
+
+/** Willekeurig blok verschillend van 0, met 1 tot 4 hexadecimale cijfers (dus vaak voorloopnullen). */
+function ipv6Group(rng: Rng, minDigits: number): number {
+  const digits = rng.int(minDigits, 4)
+  return rng.int(digits === 1 ? 1 : 16 ** (digits - 1), 16 ** digits - 1)
+}
+
+/** Waar staan de 0-blokken? (true = 0-blok) */
+function zeroLayout(rng: Rng, level: Level): boolean[] {
+  const zeros = Array<boolean>(8).fill(false)
+  const run = (start: number, length: number) => {
+    for (let i = start; i < start + length; i++) zeros[i] = true
+  }
+  if (level === 1) {
+    // Eén reeks van 2-4 nullen na de prefix (blok 3 en verder).
+    const length = rng.int(2, 4)
+    run(rng.int(2, 7 - length), length)
+  } else if (level === 2) {
+    // Twee reeksen nullen (1-3 blokken), gescheiden door minstens één blok.
+    for (;;) {
+      zeros.fill(false)
+      const a = rng.int(1, 3)
+      const b = rng.int(1, 3)
+      const startA = rng.int(2, 5)
+      const startB = startA + a + 1 + rng.int(0, 2)
+      if (startB + b <= 8 && !(a === 1 && b === 1)) {
+        run(startA, a)
+        run(startB, b)
+        break
+      }
+    }
+  } else {
+    // Expert: de lastige gevallen.
+    const pattern = rng.pick(['start', 'end', 'tie', 'singles', 'mixed'] as const)
+    if (pattern === 'start') run(0, rng.int(2, 6))
+    else if (pattern === 'end') {
+      const length = rng.int(2, 5)
+      run(8 - length, length)
+    } else if (pattern === 'tie') {
+      // Twee even lange reeksen: elk is goed; de kortste schrijfwijze kiest de eerste.
+      const length = rng.int(2, 3)
+      const startA = rng.int(0, 1)
+      run(startA, length)
+      run(startA + length + 1, length)
+    } else if (pattern === 'singles') {
+      // Enkel losse 0-blokken: :: mag ook één blok vervangen.
+      for (const i of [rng.int(1, 2), rng.int(4, 5), 7].slice(0, rng.int(2, 3))) zeros[i] = true
+    } else {
+      for (let i = 0; i < 8; i++) zeros[i] = rng.chance(0.4)
+      if (zeros.every(Boolean)) zeros[rng.int(0, 7)] = false
+      if (!zeros.some(Boolean)) zeros[rng.int(0, 7)] = true
+    }
+  }
+  return zeros
+}
+
+/** Gekende prefixen voor de eerste twee blokken (als die geen 0-blok zijn). */
+function ipv6Prefix(rng: Rng, level: Level): [number, number] {
+  if (level === 1) return [0x2001, 0x0db8] // documentatieprefix 2001:db8::/32
+  return rng.pick([
+    () => [0x2001, 0x0db8] as [number, number],
+    () => [0x2a02, ipv6Group(rng, 1)] as [number, number], // België (RIPE)
+    () => [0xfd00 + rng.int(0, 255), ipv6Group(rng, 1)] as [number, number], // unique local
+    () => [0x2001, ipv6Group(rng, 1)] as [number, number],
+  ])()
+}
+
+export function generateIpv6(rng: Rng, level: Level): Ipv6Exercise {
+  const zeros = zeroLayout(rng, level)
+  const prefix = ipv6Prefix(rng, level)
+  // Basis: blokken met meestal 2-4 cijfers; daarna ook blokken van één cijfer (0001, 000a).
+  const groups = zeros.map((zero, i) => (zero ? 0 : i < 2 ? prefix[i] : ipv6Group(rng, level === 1 ? 2 : 1)))
+  // Altijd minstens één blok met voorloopnullen (naast de 0-blokken), anders oefent regel 1 niets.
+  const candidates = groups.map((_, i) => i).filter((i) => groups[i] !== 0 && i >= 2)
+  if (!groups.some((g) => g !== 0 && g < 0x1000) && candidates.length > 0) {
+    groups[rng.pick(candidates)] = rng.int(1, 0xfff)
+  }
+  return { groups, upper: level === 3 && rng.chance(0.3) }
 }

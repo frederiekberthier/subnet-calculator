@@ -7,6 +7,7 @@ export const homePage: Page = (root) => {
     { href: '#/omrekenen', title: m.nav.convert, text: m.home.cards.convert },
     { href: '#/analyse', title: m.nav.analysis, text: m.home.cards.analysis },
     { href: '#/subnetten', title: m.nav.subnetting, text: m.home.cards.subnetting },
+    { href: '#/ipv6', title: m.nav.ipv6, text: m.home.cards.ipv6 },
   ]
   root.innerHTML = `
     <section class="hero">
