@@ -13,9 +13,9 @@ Online: <https://www.graduaatiot.be/subnetting/>
 | # | Oefening | Adres (route) | Wat de student doet |
 |---|---|---|---|
 | 1 | **Omrekenen** (binair ↔ decimaal) | `#/omrekenen` | IPv4-adres en subnetmasker omzetten in beide richtingen, plus de prefix. <img width="2074" height="1391" alt="Schermafbeelding 2026-10-25 181336" src="https://github.com/user-attachments/assets/716bf0c5-b401-4382-be8c-91533938573f" /> |
-| 2 | **Adresanalyse** | `#/analyse` | netwerkadres, eerste/laatste bruikbare adres, broadcast, aantal bruikbare hostadressen, klasse, publiek/privaat en het masker in de andere notatie |
-| 3 | **Subnetten** | `#/subnetten` | een IPv4-netwerk splitsen in minstens N even grote subnetten: geleende bits, nieuw masker, aantal subnetten, hosts per subnet en 4 subnetten volledig uitschrijven |
-| 4 | **IPv6 inkorten** | `#/ipv6` | een volledig uitgeschreven IPv6-adres zo ver mogelijk inkorten: voorloopnullen schrappen en één rij lege groepen weglaten met `::` (zero compression) |
+| 2 | **Adresanalyse** | `#/analyse` | netwerkadres, eerste/laatste bruikbare adres, broadcast, aantal bruikbare hostadressen, klasse, publiek/privaat en het masker in de andere notatie. <img width="2074" height="1391" alt="Schermafbeelding 2026-10-25 181340" src="https://github.com/user-attachments/assets/9a5d15bb-efae-469a-8d1a-edbc1cbfcfc4" />  |
+| 3 | **Subnetten** | `#/subnetten` | een IPv4-netwerk splitsen in minstens N even grote subnetten: geleende bits, nieuw masker, aantal subnetten, hosts per subnet en 4 subnetten volledig uitschrijven <img width="2074" height="1391" alt="Schermafbeelding 2026-10-25 181346" src="https://github.com/user-attachments/assets/699483c3-8713-4555-895d-dce0be79d808" /> |
+| 4 | **IPv6 inkorten** | `#/ipv6` | een volledig uitgeschreven IPv6-adres zo ver mogelijk inkorten: voorloopnullen schrappen en één rij lege groepen weglaten met `::` (zero compression) <img width="2074" height="1391" alt="Schermafbeelding 2026-10-25 181357" src="https://github.com/user-attachments/assets/5ef67ccb-4bdc-451a-80c7-035badf4c00f" /> |
 
 ### Niveaus
 Elke oefening heeft drie niveaus: **Basis**, **Gevorderd** en **Expert**.
