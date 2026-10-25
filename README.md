@@ -5,17 +5,74 @@ Studenten krijgen onbeperkt nieuwe opgaves, meteen feedback per veld en een uitg
 
 Online: <https://www.graduaatiot.be/subnetting/>
 
-<img width="2074" height="1391" alt="Schermafbeelding 2026-10-25 181327" src="https://github.com/user-attachments/assets/df7181da-2772-4f14-bb80-c98448d1c1c0" />
-
+<p align="center">
+  <img width="800" alt="Startpagina van Subnetting oefenen met de vier oefeningen" src="https://github.com/user-attachments/assets/df7181da-2772-4f14-bb80-c98448d1c1c0" />
+</p>
 
 ## Oefeningen
 
-| # | Oefening | Adres (route) | Wat de student doet |
-|---|---|---|---|
-| 1 | **Omrekenen** (binair ↔ decimaal) | `#/omrekenen` | IPv4-adres en subnetmasker omzetten in beide richtingen, plus de prefix. <img width="2074" height="1391" alt="Schermafbeelding 2026-10-25 181336" src="https://github.com/user-attachments/assets/716bf0c5-b401-4382-be8c-91533938573f" /> |
-| 2 | **Adresanalyse** | `#/analyse` | netwerkadres, eerste/laatste bruikbare adres, broadcast, aantal bruikbare hostadressen, klasse, publiek/privaat en het masker in de andere notatie. <img width="2074" height="1391" alt="Schermafbeelding 2026-10-25 181340" src="https://github.com/user-attachments/assets/9a5d15bb-efae-469a-8d1a-edbc1cbfcfc4" />  |
-| 3 | **Subnetten** | `#/subnetten` | een IPv4-netwerk splitsen in minstens N even grote subnetten: geleende bits, nieuw masker, aantal subnetten, hosts per subnet en 4 subnetten volledig uitschrijven <img width="2074" height="1391" alt="Schermafbeelding 2026-10-25 181346" src="https://github.com/user-attachments/assets/699483c3-8713-4555-895d-dce0be79d808" /> |
-| 4 | **IPv6 inkorten** | `#/ipv6` | een volledig uitgeschreven IPv6-adres zo ver mogelijk inkorten: voorloopnullen schrappen en één rij lege groepen weglaten met `::` (zero compression) <img width="2074" height="1391" alt="Schermafbeelding 2026-10-25 181357" src="https://github.com/user-attachments/assets/5ef67ccb-4bdc-451a-80c7-035badf4c00f" /> |
+<!-- HTML-tabel i.p.v. markdown: enkel zo kan GitHub de cellen bovenaan uitlijnen (valign="top").
+     GitHub verwijdert style="..." en vspace; witruimte rond de afbeeldingen daarom met <br>. -->
+<table>
+  <tr>
+    <th align="left" valign="top">#</th>
+    <th align="left" valign="top">Oefening</th>
+    <th align="left" valign="top">Adres (route)</th>
+    <th align="left" valign="top">Wat de student doet</th>
+  </tr>
+  <tr>
+    <td valign="top">1</td>
+    <td valign="top"><b>Omrekenen</b> (binair ↔ decimaal)</td>
+    <td valign="top"><code>#/omrekenen</code></td>
+    <td valign="top">IPv4-adres en subnetmasker omzetten in beide richtingen, plus de prefix.</td>
+  </tr>
+  <tr>
+    <td colspan="4" align="center">
+      <br>
+      <img width="760" alt="Oefening Omrekenen: IPv4-adres en subnetmasker binair invullen" src="https://github.com/user-attachments/assets/716bf0c5-b401-4382-be8c-91533938573f" />
+      <br><br>
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">2</td>
+    <td valign="top"><b>Adresanalyse</b></td>
+    <td valign="top"><code>#/analyse</code></td>
+    <td valign="top">netwerkadres, eerste/laatste bruikbare adres, broadcast, aantal bruikbare hostadressen, klasse, publiek/privaat en het masker in de andere notatie.</td>
+  </tr>
+  <tr>
+    <td colspan="4" align="center">
+      <br>
+      <img width="760" alt="Oefening Adresanalyse: netwerkadres, bruikbare adressen, broadcast, klasse en publiek/privaat" src="https://github.com/user-attachments/assets/9a5d15bb-efae-469a-8d1a-edbc1cbfcfc4" />
+      <br><br>
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">3</td>
+    <td valign="top"><b>Subnetten</b></td>
+    <td valign="top"><code>#/subnetten</code></td>
+    <td valign="top">een IPv4-netwerk splitsen in minstens N even grote subnetten: geleende bits, nieuw masker, aantal subnetten, hosts per subnet en 4 subnetten volledig uitschrijven.</td>
+  </tr>
+  <tr>
+    <td colspan="4" align="center">
+      <br>
+      <img width="760" alt="Oefening Subnetten: berekening en uitgeschreven subnetten" src="https://github.com/user-attachments/assets/699483c3-8713-4555-895d-dce0be79d808" />
+      <br><br>
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">4</td>
+    <td valign="top"><b>IPv6 inkorten</b></td>
+    <td valign="top"><code>#/ipv6</code></td>
+    <td valign="top">een volledig uitgeschreven IPv6-adres zo ver mogelijk inkorten: voorloopnullen schrappen en één rij lege groepen weglaten met <code>::</code> (zero compression).</td>
+  </tr>
+  <tr>
+    <td colspan="4" align="center">
+      <br>
+      <img width="760" alt="Oefening IPv6 inkorten: volledig adres en ingekort adres" src="https://github.com/user-attachments/assets/5ef67ccb-4bdc-451a-80c7-035badf4c00f" />
+      <br><br>
+    </td>
+  </tr>
+</table>
 
 ### Niveaus
 Elke oefening heeft drie niveaus: **Basis**, **Gevorderd** en **Expert**.
