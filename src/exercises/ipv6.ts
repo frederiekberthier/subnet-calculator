@@ -15,7 +15,9 @@ export const ipv6Page: Page = (root) => {
   const state = readState(PATH)
   const ex = generateIpv6(state.rng, state.level)
   const { groups } = ex
-  // <wbr> na elke dubbele punt: op een smal scherm breekt het adres enkel tussen twee blokken.
+  // <wbr> na elke dubbelpunt: op een smal scherm breekt het adres enkel tussen twee groepen.
+  // De oplossing volgt de schrijfwijze van de opgave (in de les: FD00::B13A, met hoofdletters).
+  const cased = (text: string) => (ex.upper ? text.toUpperCase() : text)
   const given = formatFull(groups, ex.upper).replaceAll(':', ':<wbr>')
 
   root.innerHTML = `
@@ -58,8 +60,8 @@ export const ipv6Page: Page = (root) => {
 
   const answer = () => {
     const result = checkShortened(input.value, groups)
-    // <wbr> na elke dubbele punt: op gsm breekt het juiste antwoord enkel tussen twee blokken.
-    return fieldAnswer(v.answer, shortest(groups).replaceAll(':', ':<wbr>'), input.value.trim(), result, input, false)
+    // <wbr> na elke dubbelpunt: op gsm breekt het juiste antwoord enkel tussen twee groepen.
+    return fieldAnswer(v.answer, cased(shortest(groups)).replaceAll(':', ':<wbr>'), input.value.trim(), result, input, false)
   }
 
   form.addEventListener('submit', (e) => {
@@ -74,13 +76,13 @@ export const ipv6Page: Page = (root) => {
 
   const renderSolution = () => {
     const runs = zeroRuns(groups)
-    const best = shortest(groups)
+    const best = cased(shortest(groups))
     const longest = runs.reduce((a, b) => (b.length > a.length ? b : a))
     const inLongest = (i: number) => i >= longest.start && i < longest.start + longest.length
-    const others = validShortenings(groups).filter((s) => s !== best)
+    const others = validShortenings(groups).map(cased).filter((s) => s !== best)
     const blocks = groups.map((g) => {
-      const full = g.toString(16).padStart(4, '0')
-      const short = g.toString(16)
+      const full = cased(g.toString(16).padStart(4, '0'))
+      const short = cased(g.toString(16))
       return { full, short, zeros: full.length - short.length }
     })
     // Elk item (bv. 0db8 → db8) blijft samen op één regel.
@@ -103,7 +105,7 @@ export const ipv6Page: Page = (root) => {
     const changed = [...new Set(blocks.filter((b) => b.zeros).map((b) => `${b.full} → ${b.short}`))]
     const unchanged = [...new Set(blocks.filter((b) => !b.zeros).map((b) => b.full))]
 
-    // Regel 2: het adres na regel 1, met de 0-reeksen en de gekozen reeks voor ::.
+    // Regel 2: het adres na regel 1, met de rijen lege groepen en de rij die met :: wegvalt.
     const rule2Chips = blocks
       .map(
         (b, i) =>
@@ -126,7 +128,7 @@ export const ipv6Page: Page = (root) => {
           ${changed.length ? `<li>${v.changed(changed.map(mono).join(' · '))}</li>` : ''}
           ${unchanged.length ? `<li>${v.unchanged(unchanged.map(mono).join(', '))}</li>` : ''}
         </ul>
-        <p class="v6-result">${v.result1(stripLeadingZeros(groups))}</p>
+        <p class="v6-result">${v.result1(cased(stripLeadingZeros(groups)))}</p>
       </section>
 
       <section class="v6-rule">

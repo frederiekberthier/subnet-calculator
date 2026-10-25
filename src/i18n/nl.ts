@@ -5,7 +5,7 @@ export const nl = {
   site: {
     title: 'Subnetting oefenen',
     description:
-      'Oefen IPv4-subnetting en IPv6: omrekenen binair ↔ decimaal, adresanalyse, subnetten en IPv6-adressen verkorten, met directe feedback en uitgewerkte oplossingen. Graduaat Internet of Things, Howest.',
+      'Oefen IPv4-subnetting en IPv6: omrekenen binair ↔ decimaal, adresanalyse, subnetten en IPv6-adressen inkorten, met directe feedback en uitgewerkte oplossingen. Graduaat Internet of Things, Howest.',
     skip: 'Naar inhoud',
     brandLabel: 'Subnetting oefenen, startpagina',
     brandSub: 'Graduaat IoT',
@@ -15,7 +15,7 @@ export const nl = {
     convert: 'Omrekenen',
     analysis: 'Adresanalyse',
     subnetting: 'Subnetten',
-    ipv6: 'IPv6 verkorten',
+    ipv6: 'IPv6 inkorten',
   },
   /** Korte namen voor het menu bovenaan (op gsm staan de drie naast elkaar). */
   menu: {
@@ -39,7 +39,7 @@ export const nl = {
       convert: 'Zet een IPv4-adres en subnetmasker om van decimaal naar binair en omgekeerd.',
       analysis: 'Bepaal netwerkadres, eerste en laatste host, broadcast, klasse en publiek/privaat.',
       subnetting: 'Splits een netwerk in een gevraagd aantal kleinere subnetten.',
-      ipv6: 'Schrijf een volledig IPv6-adres zo kort mogelijk: voorloopnullen weg en één reeks nullen vervangen door ::.',
+      ipv6: 'Kort een volledig IPv6-adres in: schrap de voorloopnullen en laat één rij groepen met enkel nullen weg (::).',
     },
   },
   notFound: {
@@ -83,11 +83,11 @@ export const nl = {
     eightBits: 'Schrijf elke byte met precies 8 bits (vul aan met nullen vooraan).',
     prefixRange: 'Een prefix is een getal van 0 tot 32, bv. /24.',
     integer: 'Geef een geheel getal.',
-    ipv6Format: 'Schrijf een IPv6-adres als blokken van hoogstens 4 hexadecimale cijfers (0–9, a–f), gescheiden door dubbele punten.',
-    ipv6Once: ':: mag maar één keer in een adres staan: anders weet je niet hoeveel 0-blokken elke :: vervangt.',
-    ipv6LeadingZeros: 'Laat in elk blok de voorloopnullen weg (bv. 0db8 → db8, 0042 → 42, 0000 → 0).',
-    ipv6UseDoubleColon: 'Vervang een reeks opeenvolgende 0-blokken door ::.',
-    ipv6PartialRun: 'Laat :: een volledige reeks 0-blokken vervangen: er staat nog een 0-blok naast de ::.',
+    ipv6Format: 'Schrijf een IPv6-adres als groepen van hoogstens 4 hexadecimale cijfers (0–9, A–F), gescheiden door een dubbelpunt.',
+    ipv6Once: 'Zero compression (::) mag maar één keer: anders weet je niet hoeveel lege groepen elke :: voorstelt.',
+    ipv6LeadingZeros: 'Schrap in elke groep de voorloopnullen (bv. 0DB8 → DB8, 0370 → 370, 0000 → 0).',
+    ipv6UseDoubleColon: 'Laat een rij aaneengesloten groepen met enkel nullen weg en vervang ze door ::.',
+    ipv6PartialRun: 'Laat met :: de volledige rij lege groepen weg: er staat nog een groep met enkel nullen naast de ::.',
   },
   bits: {
     table: 'Binaire uitwerking',
@@ -176,29 +176,29 @@ export const nl = {
       '<strong>Per subnet:</strong> eerste bruikbare = netwerkadres + 1, broadcast = volgend netwerkadres − 1, laatste bruikbare = broadcast − 1.',
   },
   ipv6: {
-    title: '4. IPv6 verkorten',
-    subtitle: 'voorloopnullen weglaten en ::',
-    lead: 'Schrijf het IPv6-adres zo kort mogelijk. Laat in elk blok de voorloopnullen weg en vervang één reeks opeenvolgende 0-blokken door <strong>::</strong>. Dat mag maar één keer per adres.',
+    title: '4. IPv6 inkorten',
+    subtitle: 'voorloopnullen schrappen en lege groepen weglaten',
+    lead: 'Kort het IPv6-adres zo ver mogelijk in. Schrap in elke groep de voorloopnullen en laat één rij aaneengesloten groepen met enkel nullen weg: vervang ze door een dubbele dubbelpunt <strong>::</strong>. Die zero compression mag maar één keer.',
     given: 'IPv6-adres',
-    answer: 'Verkort adres',
-    colBlock: 'Blok',
-    rule1Title: 'Regel 1 – voorloopnullen weglaten',
+    answer: 'Ingekort adres',
+    colBlock: 'Groep',
+    rule1Title: 'Regel 1 – voorloopnullen schrappen',
     rule1Intro:
-      'In elk blok vallen de nullen <strong>vooraan</strong> weg: ze veranderen de waarde niet (0042 = 42). Nullen achteraan of in het midden blijven staan (ff00, 0a0b → a0b). Van een blok met enkel nullen blijft één 0 over (0000 → 0).',
+      'Nullen bij het <strong>begin</strong> van een groep (hextet) mogen geschrapt worden: ze veranderen de waarde niet (0370 = 370). Nullen achteraan of in het midden blijven staan (FF00, 0A0B → A0B). Van een groep met enkel nullen blijft één 0 over (0000 → 0).',
     removed: (n: number) => (n === 0 ? 'geen' : `−${n} ${n === 1 ? 'nul' : 'nullen'}`),
-    changed: (list: string) => `Aangepaste blokken: ${list}.`,
+    changed: (list: string) => `Aangepaste groepen: ${list}.`,
     unchanged: (list: string) => `Geen voorloopnullen, dus ongewijzigd: ${list}.`,
     result1: (text: string) => `Na regel 1: <span class="mono">${text}</span>`,
-    rule2Title: 'Regel 2 – één reeks 0-blokken door :: vervangen',
+    rule2Title: 'Regel 2 – lege groepen weglaten (zero compression)',
     rule2Intro:
-      'Zoek de reeksen opeenvolgende 0-blokken in het adres van regel 1. Eén reeks mag je vervangen door <strong>::</strong> (de langste reeks geeft het kortste adres).',
+      'Zoek in het adres van regel 1 de rijen aaneengesloten groepen met enkel nullen. Eén rij mag je weglaten en vervangen door een dubbele dubbelpunt <strong>::</strong> (de langste rij geeft het kortste adres).',
     rule2Chosen: (length: number, from: number, text: string) =>
-      `De langste reeks is ${length} ${length === 1 ? 'blok' : 'blokken'} vanaf blok ${from} → <span class="mono">${text}</span>`,
+      `De langste rij is ${length} ${length === 1 ? 'groep' : 'groepen'} vanaf groep ${from} → <span class="mono">${text}</span>`,
     leadingZeros: 'voorloopnullen',
-    zeroRun: 'reeks 0-blokken',
+    zeroRun: 'rij groepen met enkel nullen',
     alternatives: (list: string) =>
-      `Ook juist: ${list}. Je mag kiezen welke reeks nullen je door :: vervangt, maar :: mag maar één keer voorkomen.`,
-    once: 'Waarom maar één keer? Bij twee keer :: weet je niet meer hoeveel 0-blokken elke :: voorstelt.',
+      `Ook juist: ${list}. Je mag kiezen welke rij lege groepen je weglaat, maar zero compression mag maar één keer.`,
+    once: 'Waarom maar één keer? Met twee keer :: weet je niet meer hoeveel lege groepen elke :: voorstelt: FD00::B13A:831::6789 is fout, FD00::B13A:831:0:6789 is juist.',
   },
 }
 

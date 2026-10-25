@@ -27,7 +27,7 @@ beforeEach(() => {
   setLang('nl')
 })
 
-describe('oefening 4: IPv6 verkorten', () => {
+describe('oefening 4: IPv6 inkorten', () => {
   it('toont het volledige adres als opgave', () => {
     const ex = render(7)
     expect(root.querySelector('.ipv6-given')!.textContent).toBe(formatFull(ex.groups, ex.upper))
@@ -55,12 +55,23 @@ describe('oefening 4: IPv6 verkorten', () => {
   it('voorloopnul laten staan bij het juiste adres: tip over voorloopnullen', () => {
     const ex = render(1, 1)
     const answer = shortest(ex.groups).replace('db8', '0db8')
-    expect(check(answer)).toContain('voorloopnullen weg')
+    expect(check(answer)).toContain('Schrap in elke groep de voorloopnullen')
   })
 
   it(':: twee keer: tip', () => {
     render(1, 1)
     expect(check('2001::1::1')).toContain('maar één keer')
+  })
+
+  it('de oplossing volgt de schrijfwijze van de opgave (hoofdletters zoals in de les)', () => {
+    // zoek een Expert-opgave in hoofdletters met minstens één letter A-F in het antwoord
+    let seed = 1
+    while (!generateIpv6(createRng(seed), 3).upper || !/[a-f]/.test(shortest(generateIpv6(createRng(seed), 3).groups))) seed++
+    const ex = render(seed, 3)
+    root.querySelector<HTMLElement>('[data-action="solution"]')!.click()
+    const text = root.querySelector('.solution')!.textContent!
+    expect(text).toContain(shortest(ex.groups).toUpperCase())
+    expect(text).not.toContain(shortest(ex.groups))
   })
 
   it('de oplossing toont de 8 blokken, de stappen en het antwoord van de student (ge-escaped)', () => {
@@ -75,7 +86,7 @@ describe('oefening 4: IPv6 verkorten', () => {
     expect(solution.innerHTML).toContain('&lt;b&gt;x&lt;/b&gt;')
   })
 
-  it('regel 1 vermeldt de voorloopnullen expliciet: per blok gemarkeerd, geteld en opgesomd', () => {
+  it('regel 1 vermeldt de voorloopnullen expliciet: per groep gemarkeerd, geteld en opgesomd', () => {
     const ex = render(1, 1) // 2001:0db8:... (niveau 1 begint altijd met de documentatieprefix)
     root.querySelector<HTMLElement>('[data-action="solution"]')!.click()
     const solution = root.querySelector('.solution')!
@@ -90,7 +101,7 @@ describe('oefening 4: IPv6 verkorten', () => {
     expect(cards[0].querySelector('.v6-removed')!.textContent).toBe('geen')
     // opsomming van de aangepaste blokken en het resultaat van regel 1
     const text = solution.textContent!.replace(/\s+/g, ' ')
-    expect(text).toContain('Aangepaste blokken: 0db8 → db8')
+    expect(text).toContain('Aangepaste groepen: 0db8 → db8')
     expect(text).toContain('0000 → 0')
     expect(text).toContain('ongewijzigd: 2001')
     expect(text).toContain(`Na regel 1: ${ex.groups.map((g) => g.toString(16)).join(':')}`)
